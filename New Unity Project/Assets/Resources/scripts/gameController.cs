@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class gameController{
 	List<GameObject> fallingObs;
@@ -11,12 +12,14 @@ public class gameController{
 	Vector3 yoffset = new Vector3 (0, 0, 0);
 	Vector3 zoffset = new Vector3 (0, 0, 0);//might need in future to expand cube
 	Vector3 totaloffset = new Vector3 (0, -0.5f, 0);
+	int numberOfPuzzle;
 
-	public gameController(int size, GameObject playerOb){
+	public gameController(int size, GameObject playerOb, int numberOfP){
 		groundsize = size;
 		fallingObs=new List<GameObject>();
 		occupied = new int[size, size, size];
 		this.player = playerOb;
+		numberOfPuzzle = numberOfP;
 	}
 
 	public void CreateEnvironment(){
@@ -36,6 +39,12 @@ public class gameController{
 	}
 
 	public void generatePuzzle(){
+		System.Random rnd = new System.Random();
+		int puzzleindex = rnd.Next (0, numberOfPuzzle);
+		int x = rnd.Next (1, groundsize - 2);
+		int y = rnd.Next (1, groundsize - 2);
+		int z = rnd.Next (1, groundsize - 2);
+		GameObject newpuzzle=GameObject.Instantiate(Resources.Load("prefabs/puzzle"+puzzleindex.ToString));
 	}
 
 	void CreateCubeMat(Vector3 x, Vector3 y, Vector3 ori){
@@ -56,15 +65,15 @@ public class gameController{
 	}
 
 	bool setGrid(Vector3 cood){
-		if (occupied [cood.x] [cood.y] [cood.x] == 1) {
+		if (occupied [(int)cood.x, (int)cood.y, (int)cood.x] == 1) {
 			return false;
 		}
-		occupied [cood.x] [cood.y] [cood.x] = 1;
+		occupied [(int)cood.x, (int)cood.y, (int)cood.x] = 1;
 		return true;
 	}
 
 	bool checkGrid(Vector3 cood){
-		if (occupied [cood.x] [cood.y] [cood.x] == 1) {
+		if (occupied [(int)cood.x, (int)cood.y, (int)cood.x] == 1) {
 			return true;
 		}
 		return false;

@@ -6,6 +6,7 @@ public class Main : MonoBehaviour {
 	int groundsize = 6;
 	float timeinterval = 0;
 	int targetTime = 6;//how long to generate a puzzle
+	int numberOfPuzzle=5;
 	gameController controller;
 	GameObject player;
 	// Use this for initialization
@@ -13,7 +14,7 @@ public class Main : MonoBehaviour {
 		//init player
 		player = GameObject.FindGameObjectWithTag ("Player");
 		//init controller
-		controller = new gameController (groundsize, player);
+		controller = new gameController (groundsize, player, numberOfPuzzle);
 		controller.CreateEnvironment ();
 	}
 	
