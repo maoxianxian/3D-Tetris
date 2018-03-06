@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Main : MonoBehaviour {
-	int groundsize=6;
+	int groundsize = 6;
+	float timeinterval = 0;
+	int targetTime = 6;//how long to generate a puzzle
 	gameController controller;
 	GameObject player;
 	// Use this for initialization
@@ -13,12 +15,15 @@ public class Main : MonoBehaviour {
 		//init controller
 		controller = new gameController (groundsize, player);
 		controller.CreateEnvironment ();
-
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		timeinterval += Time.deltaTime;
+		if (timeinterval > targetTime) {
+			timeinterval = 0;
+			controller.generatePuzzle ();
+		}
 	}
 
 

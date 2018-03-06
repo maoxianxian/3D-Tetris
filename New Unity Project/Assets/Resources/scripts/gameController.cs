@@ -16,7 +16,7 @@ public class gameController{
 		groundsize = size;
 		fallingObs=new List<GameObject>();
 		occupied = new int[size, size, size];
-		this->player = playerOb;
+		this.player = playerOb;
 	}
 
 	public void CreateEnvironment(){
@@ -29,9 +29,16 @@ public class gameController{
 		CreateCubeMat (Vector3.up, Vector3.right, new Vector3 (0, 0.5f, -0.5f) - zoffset + totaloffset);
 		//ceiling
 		CreateCubeMat (Vector3.right, Vector3.forward, Vector3.up * groundsize + yoffset + totaloffset);
+		//place player
+		Vector3 pos = new Vector3 (groundsize / 2, 0, groundsize / 2);
+		player.transform.position = pos;
+		setGrid (pos);
 	}
 
-	public void CreateCubeMat(Vector3 x, Vector3 y, Vector3 ori){
+	public void generatePuzzle(){
+	}
+
+	void CreateCubeMat(Vector3 x, Vector3 y, Vector3 ori){
 		for (int i = 0; i < groundsize; i++) {
 			for (int j = 0; j < groundsize; j++) {
 				GameObject groundcub = (GameObject)GameObject.Instantiate (Resources.Load ("prefabs/groundCube"));
@@ -47,4 +54,21 @@ public class gameController{
 		float z = Mathf.Floor (WorldCoord.z + 0.5f);
 		return new Vector3 (x, y, z);
 	}
+
+	bool setGrid(Vector3 cood){
+		if (occupied [cood.x] [cood.y] [cood.x] == 1) {
+			return false;
+		}
+		occupied [cood.x] [cood.y] [cood.x] = 1;
+		return true;
+	}
+
+	bool checkGrid(Vector3 cood){
+		if (occupied [cood.x] [cood.y] [cood.x] == 1) {
+			return true;
+		}
+		return false;
+	}
+
+
 }
