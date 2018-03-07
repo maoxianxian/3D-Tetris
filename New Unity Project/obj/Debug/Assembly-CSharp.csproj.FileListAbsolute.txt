@@ -79,3 +79,4 @@ D:\cse165-pa4\New Unity Project\Temp\bin\Debug\UnityEditor.iOS.Extensions.Xcode.
 D:\cse165-pa4\New Unity Project\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
 D:\cse165-pa4\New Unity Project\obj\Debug\Assembly-CSharp.dll
 D:\cse165-pa4\New Unity Project\obj\Debug\Assembly-CSharp.pdb
+D:\cse165-pa4\New Unity Project\Temp\bin\Debug\LeapCSharp.NET3.5.dll

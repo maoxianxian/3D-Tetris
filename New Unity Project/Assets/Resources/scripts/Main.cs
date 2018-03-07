@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class Main : MonoBehaviour {
 	int groundsize = 6;
-	float timeinterval = 0;
-	int targetTime = 6;//how long to generate a puzzle
+	float generatetime = 0;
+	float movetime=0;
+	int timePerGenerate = 6;//how long to generate a puzzle
 	int numberOfPuzzle=5;
+	int timeperunit=2;//time a cube spend on one unit
+
 	gameController controller;
 	GameObject player;
 	// Use this for initialization
@@ -20,11 +23,17 @@ public class Main : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		timeinterval += Time.deltaTime;
-		if (timeinterval > targetTime) {
-			timeinterval = 0;
+		generatetime += Time.deltaTime;
+		movetime += Time.deltaTime;
+		if (generatetime > timePerGenerate) {
+			generatetime = 0;
 			controller.generatePuzzle ();
 		}
+		if (movetime > timeperunit) {
+			movetime = 0;
+			controller.BeginMovePuzzle ();
+		}
+		controller.moveFallingPuzzle ();
 	}
 
 
