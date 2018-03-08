@@ -6,7 +6,7 @@ public class Main : MonoBehaviour {
 	int groundsize = 6;
 	float generatetime = 0;
 	float movetime=0;
-	int timePerGenerate = 5;//how long to generate a puzzle
+	int timePerGenerate = 6;//how long to generate a puzzle
 	int numberOfPuzzle=5;
 	int timeperunit=2;//time a cube spend on one unit
 
