@@ -12,10 +12,10 @@ public class gameController{
 		new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,2),	new Vector3(0,1,1),				
 		new Vector3(0,1,0),	new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,1)
 	};
-	List<GameObject> pendingObs;
 	List<GameObject> fallingObs;
 	int currentStep = 0;
 	int totalStep=100;
+	int empty=0;
 	int[ , , ] occupied;
 	int groundsize;
 	GameObject player;
@@ -29,7 +29,6 @@ public class gameController{
 	public gameController(int size, GameObject playerOb, int numberOfP){
 		groundsize = size;
 		fallingObs = new List<GameObject> ();
-		pendingObs = new List<GameObject> ();
 		occupied = new int[size, size, size];
 		player = playerOb;
 		numberOfPuzzle = numberOfP;
@@ -61,35 +60,43 @@ public class gameController{
 		newpuzzle.transform.position = new Vector3 (x, groundsize - 2, z);
 		for (int i = 0; i < newpuzzle.transform.childCount; i++) {
 			GameObject cube = newpuzzle.transform.GetChild (i).gameObject;
-			pendingObs.Add (cube);
 			Vector3 cubecoord = WorldToCube (cube.transform.position);
 			setGrid (cubecoord);
 		}
-		//printGrid ();
+		fallingObs.Add (newpuzzle);
+		printGrid ();
 	}
 
 	public bool BeginMovePuzzle(){
-		bool finish=false;
-		while (pendingObs.Count != 0 && !finish) {
-			finish = true;
-			for (int i = pendingObs.Count - 1; i >= 0; i--) {
-				Vector3 cubecoor = WorldToCube (pendingObs [i].transform.position);
+		for (int i = fallingObs.Count - 1; i >= 0; i--) {//foreach puzzle
+			bool puzzlemovale = true;
+			for (int j = fallingObs [i].transform.childCount - 1; j >= 0; j--) {//foreach cube in puzzle
+				GameObject cube = fallingObs [i].transform.GetChild (j).gameObject;
+				Vector3 cubecoor = WorldToCube (cube.transform.position);
 				if (cubecoor.y > 0) {
 					Vector3 targetcoord = cubecoor + Vector3.down;
-					if (targetcoord == playercoord) {
+					if (targetcoord == playercoord) {//hit player
 						return false;
 					}
-					if (!checkGrid (targetcoord)) {
-						finish = false;
-						fallingObs.Add (pendingObs [i]);
-						pendingObs.RemoveAt (i);
-						unsetGrid (cubecoor);
-						setGrid (targetcoord);
+					if (!(getGrid (targetcoord) == 0) && !(getGrid (targetcoord) == getGrid (cubecoor))) {//cube not movable
+						puzzlemovale = false;
 					}
+				} else {//puzzle not movable
+					puzzlemovale = false;
 				}
 			}
+			if (puzzlemovale) {
+				for (int j = fallingObs [i].transform.childCount - 1; j >= 0; j--) {//foreach cube in puzzle
+					GameObject cube = fallingObs [i].transform.GetChild (j).gameObject;
+					Vector3 cubecoor = WorldToCube (cube.transform.position);
+					Vector3 targetcoord = cubecoor + Vector3.down;
+					unsetGrid (cubecoor);
+					setGrid (targetcoord);
+				}
+			} else {
+				fallingObs.Remove (fallingObs [i]);
+			}
 		}
-		pendingObs.Clear ();
 		currentStep = 0;
 		return true;
 	}
@@ -101,12 +108,14 @@ public class gameController{
 				g.transform.position += new Vector3 (0, -1.0f / totalStep, 0);
 			}
 		} else if (currentStep == totalStep) {
-			pendingObs = fallingObs;
-			fallingObs = new List<GameObject> ();
 			currentStep++;
+			finishmoving ();
 		}
 	}
-	//public void 
+
+	void finishmoving(){
+	}
+
 	void CreateCubeMat(Vector3 x, Vector3 y, Vector3 ori){
 		for (int i = 0; i < groundsize; i++) {
 			for (int j = 0; j < groundsize; j++) {
@@ -124,8 +133,12 @@ public class gameController{
 		return new Vector3 (x, y, z);
 	}
 
+	int getGrid(Vector3 cood){
+		return occupied [(int)(cood.x), (int)(cood.y), (int)(cood.z)];
+	}
+
 	bool setGrid(Vector3 cood){
-		if (occupied [(int)(cood.x), (int)(cood.y), (int)(cood.z)] == 1) {
+		if (getGrid(cood) == 1) {
 			return false;
 		}
 		occupied [(int)(cood.x), (int)(cood.y), (int)(cood.z)] = 1;
@@ -133,18 +146,11 @@ public class gameController{
 	}
 
 	bool unsetGrid(Vector3 cood){
-		if ((occupied [(int)cood.x, (int)cood.y, (int)cood.z] == 0)) {
+		if (getGrid(cood) == 0) {
 			return false;
 		}
 		occupied [(int)cood.x, (int)cood.y, (int)cood.z] = 0;
 		return true;
-	}
-
-	bool checkGrid(Vector3 cood){
-		if (occupied [(int)cood.x, (int)cood.y, (int)cood.z] == 1) {
-			return true;
-		}
-		return false;
 	}
 
 	void printGrid(){
