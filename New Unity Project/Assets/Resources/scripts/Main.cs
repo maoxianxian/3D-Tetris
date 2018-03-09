@@ -6,12 +6,13 @@ public class Main : MonoBehaviour {
 	int groundsize = 6;
 	float generatetime = 0;
 	float movetime=0;
-	int timePerGenerate = 6;//how long to generate a puzzle
+	int timePerGenerate = 4;//how long to generate a puzzle
 	int numberOfPuzzle=5;
 	int timeperunit=2;//time a cube spend on one unit
 
 	gameController controller;
 	GameObject player;
+	handController hands;
 	// Use this for initialization
 	void Start () {
 		//init player
@@ -19,6 +20,7 @@ public class Main : MonoBehaviour {
 		//init controller
 		controller = new gameController (groundsize, player, numberOfPuzzle);
 		controller.CreateEnvironment ();
+		hands = new handController ();
 	}
 	
 	// Update is called once per frame
@@ -34,8 +36,8 @@ public class Main : MonoBehaviour {
 			controller.BeginMovePuzzle ();
 		}
 		controller.moveFallingPuzzle ();
+
+		hands.connectToHands ();
+		hands.moveobj ();
 	}
-
-
-
 }

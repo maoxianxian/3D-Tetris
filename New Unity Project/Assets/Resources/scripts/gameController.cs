@@ -27,8 +27,10 @@ public class gameController{
 	int numberOfPuzzle;
 	int playerid=999;
 	int puzzlecount=0;
+	List<ObjectMover> movers;
 
 	public gameController(int size, GameObject playerOb, int numberOfP){
+		movers = new List<ObjectMover> ();
 		groundsize = size;
 		fallingObs = new List<GameObject> ();
 		occupied = new int[size, size, size];
@@ -68,10 +70,10 @@ public class gameController{
 		}
 		fallingObs.Add (newpuzzle);
 		newpuzzle.name = puzzlecount.ToString();
-		printGrid ();
 	}
 
 	public bool BeginMovePuzzle(){
+		movers.Clear ();
 		for (int i = fallingObs.Count - 1; i >= 0; i--) {//foreach puzzle
 			bool puzzlemovale = true;
 			for (int j = fallingObs [i].transform.childCount - 1; j >= 0; j--) {//foreach cube in puzzle
@@ -90,13 +92,9 @@ public class gameController{
 				}
 			}
 			if (puzzlemovale) {
-				for (int j = fallingObs [i].transform.childCount - 1; j >= 0; j--) {//foreach cube in puzzle
-					GameObject cube = fallingObs [i].transform.GetChild (j).gameObject;
-					Vector3 cubecoor = WorldToCube (cube.transform.position);
-					Vector3 targetcoord = cubecoor + Vector3.down;
-					unsetGrid (cubecoor);
-					setGrid (targetcoord, Int32.Parse(fallingObs[i].name));
-				}
+				ObjectMover mover = new ObjectMover (fallingObs [i],occupied);
+				mover.startMove (new Vector3 (0, -1, 0));
+				movers.Add (mover);
 			} else {
 				fallingObs.Remove (fallingObs [i]);
 			}
@@ -108,8 +106,8 @@ public class gameController{
 	public void moveFallingPuzzle(){
 		if (currentStep < totalStep) {
 			currentStep++;
-			foreach (GameObject g in fallingObs) {
-				g.transform.position += new Vector3 (0, -1.0f / totalStep, 0);
+			foreach (ObjectMover m in movers) {
+				m.Update ();
 			}
 		} else if (currentStep == totalStep) {
 			currentStep++;
