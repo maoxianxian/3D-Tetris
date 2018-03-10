@@ -10,7 +10,7 @@ namespace gam
         float movetime = 0;
         int timePerGenerate = 6;//how long to generate a puzzle
         int numberOfPuzzle = 5;
-        int timeperunit = 2;//time a cube spend on one unit
+        int timeperunit = 3;//time a cube spend on one unit
         int total = 0;
         gameController controller;
         GameObject player;
@@ -35,7 +35,7 @@ namespace gam
             {
                 total++;
                 generatetime = 0;
-                //controller.generatePuzzle();
+                controller.generatePuzzle();
             }
             if (movetime > timeperunit)
             {

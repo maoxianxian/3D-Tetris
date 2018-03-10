@@ -84,33 +84,43 @@ namespace gam
                     Vector3 dir = leapToWorld(righthand.PalmPosition) - leaporigin;
                     if (decideDirection(normal) != Vector3.zero)
                     {//valid pos
-                        if (Physics.Raycast(leaporigin + leftoffset, dir, out info) || Physics.Raycast(leaporigin + rightoffset, dir, out info))
-                        {// has target
-                            GameObject target = info.collider.gameObject;
-                            target.GetComponent<Renderer>().material = new Material(Resources.Load("materials/highlightmat", typeof(Material)) as Material);
-                            if (prepos == Vector3.zero)
-                            {//first hit
-                                prepos = leapToWorld(righthand.PalmPosition);
+                        if (!isFist(righthand))
+                        {//translate
+                            if (Physics.Raycast(leaporigin + leftoffset, dir, out info) || Physics.Raycast(leaporigin + rightoffset, dir, out info))
+                            {// has target
+                                GameObject target = info.collider.gameObject;
+                                target.GetComponent<Renderer>().material = new Material(Resources.Load("materials/highlightmat", typeof(Material)) as Material);
+                                if (prepos == Vector3.zero)
+                                {//first hit
+                                    prepos = leapToWorld(righthand.PalmPosition);
+                                }
+                                else
+                                {
+                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.05f)
+                                    {
+                                        int id = Int32.Parse(target.transform.parent.gameObject.name);
+                                        puzzle p = gameController.GetPuzzle(id);
+                                        if (p.startMove(decideDirection(normal)))
+                                        {
+                                            objtime = 0;
+                                        }
+                                        prepos = Vector3.zero;
+                                    }
+                                }
                             }
                             else
-                            {
-                                if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.05f)
-                                {
-                                    int id = Int32.Parse(target.transform.parent.gameObject.name);
-                                    puzzle p = gameController.GetPuzzle(id);
-                                    Debug.Log("Fail");
-                                    if (p.startMove(decideDirection(normal)))
-                                    {
-                                        Debug.Log("succss");
-                                        objtime = 0;
-                                    }
-                                    prepos = Vector3.zero;
-                                }
+                            { //reset pre
+                                prepos = Vector3.zero;
                             }
                         }
                         else
-                        { //reset pre
-                            prepos = Vector3.zero;
+                        {
+                            if (Physics.Raycast(leaporigin + leftoffset, dir, out info) || Physics.Raycast(leaporigin + rightoffset, dir, out info))
+                            {// has target
+                                GameObject target = info.collider.gameObject;
+                                GameObject parent = target.transform.parent.gameObject;
+                                parent.transform.right = -decideDirection(normal);
+                            }
                         }
                     }
                 }
