@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class ObjectMover {
+public class ObjectMoverObslete {
 	GameObject obj;
 	int[,,] grid;
 	int step = 0;
 	int totalStep=100;
 	Vector3 direction;
-	public ObjectMover(GameObject objl, int[,,] gridl){
+	public ObjectMoverObslete(GameObject objl, int[,,] gridl){
 		obj = objl;
 		grid = gridl;
 	}
