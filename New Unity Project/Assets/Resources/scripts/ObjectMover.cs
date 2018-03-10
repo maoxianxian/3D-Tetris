@@ -14,17 +14,21 @@ public class ObjectMover {
 		grid = gridl;
 	}
 
-	public void startMove(Vector3 dir){
+	public bool startMove(Vector3 dir){
 		direction = dir;
 		if (obj.tag == "puzzle") {
 			for (int j = 0; j <obj.transform.childCount; j++) {//foreach cube in puzzle
 				GameObject cube = obj.transform.GetChild (j).gameObject;
 				Vector3 cubecoor = WorldToCube (cube.transform.position);
-				Vector3 targetcoord = cubecoor + Vector3.down;
+				Vector3 targetcoord = cubecoor + dir;
+				if (!valid (targetcoord)) {
+					return false;
+				}
 				unsetGrid (cubecoor);
 				setGrid (targetcoord, Int32.Parse (obj.name));
 			}
 		}
+		return true;
 	}
 
 	public void Update(){
@@ -59,6 +63,15 @@ public class ObjectMover {
 			return false;
 		}
 		grid [(int)cood.x, (int)cood.y, (int)cood.z] = 0;
+		return true;
+	}
+
+	bool valid(Vector3 cood){
+		for (int i = 0; i < 3; i++) {
+			if (cood [i] < 0 || cood [i] == grid.GetLength (1)) {
+				return false;
+			}
+		}
 		return true;
 	}
 }

@@ -20,7 +20,7 @@ public class Main : MonoBehaviour {
 		//init controller
 		controller = new gameController (groundsize, player, numberOfPuzzle);
 		controller.CreateEnvironment ();
-		hands = new handController ();
+		hands = new handController (controller);
 	}
 	
 	// Update is called once per frame
@@ -29,7 +29,7 @@ public class Main : MonoBehaviour {
 		movetime += Time.deltaTime;
 		if (generatetime > timePerGenerate) {
 			generatetime = 0;
-			//controller.generatePuzzle ();
+			controller.generatePuzzle ();
 		}
 		if (movetime > timeperunit) {
 			movetime = 0;

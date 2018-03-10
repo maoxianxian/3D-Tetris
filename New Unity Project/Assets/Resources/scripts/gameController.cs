@@ -80,9 +80,9 @@ public class gameController{
 				Vector3 cubecoor = WorldToCube (cube.transform.position);
 				if (cubecoor.y > 0) {
 					Vector3 targetcoord = cubecoor + Vector3.down;
-					if (targetcoord == playercoord) {//hit player
-						return false;
-					}
+					//if (targetcoord == playercoord) {//hit player
+						//return false;
+					//}
 					if (!(getGrid (targetcoord) == 0) && !(getGrid (targetcoord) == getGrid (cubecoor))) {//cube not movable
 						puzzlemovale = false;
 					}
@@ -113,6 +113,14 @@ public class gameController{
 			if (checkMat ()) {
 			}
 		}
+	}
+
+	public void addMover(ObjectMover mover){
+		movers.Add (mover);
+	}
+
+	public int[,,] getGrid(){
+		return occupied;
 	}
 
 	bool checkMat(){
