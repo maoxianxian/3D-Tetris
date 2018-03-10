@@ -29,7 +29,7 @@ public class Main : MonoBehaviour {
 		movetime += Time.deltaTime;
 		if (generatetime > timePerGenerate) {
 			generatetime = 0;
-			controller.generatePuzzle ();
+			//controller.generatePuzzle ();
 		}
 		if (movetime > timeperunit) {
 			movetime = 0;

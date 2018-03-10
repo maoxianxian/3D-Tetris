@@ -5,17 +5,16 @@ using System;
 
 public class gameController{
 	//int[,] puzzlecoord=new int[,]{{0,0,0},{0,0,1},{0,0,2},{0,1,0},
-	Vector3[] puzzlecoord={
+/*	Vector3[] puzzlecoord={
 		new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,0,2),	new Vector3(0,1,0),				
 		new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,0,2),	new Vector3(0,1,1),				
 		new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,0,2),	new Vector3(0,0,3),	
 		new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,2),	new Vector3(0,1,1),				
 		new Vector3(0,1,0),	new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,1)
-	};
+	};*/
 	List<GameObject> fallingObs;
 	int currentStep = 0;
 	int totalStep=100;
-	int empty=0;
 	int[ , , ] occupied;
 	int groundsize;
 	GameObject player;
