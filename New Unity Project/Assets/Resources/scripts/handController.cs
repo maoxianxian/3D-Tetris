@@ -16,6 +16,7 @@ namespace gam
         Camera camera;
         RaycastHit info;
         Vector3 prepos = Vector3.zero;
+        Vector3 predir = Vector3.zero;
         gameController gamer;
         float correctpos = 0.9f;
 
@@ -75,21 +76,22 @@ namespace gam
             Matrix4x4 ctw = camera.cameraToWorldMatrix;
             Vector3 leftoffset = vec4To3(ctw * vec3To4(Vector3.left * 0.1f, 0));
             Vector3 rightoffset = vec4To3(ctw * vec3To4(Vector3.right * 0.1f, 0));
-            if (objtime > 2)
+            Vector3 upoffset = vec4To3(ctw * vec3To4(Vector3.up * 0.1f, 0));
+            Vector3 downoffset = vec4To3(ctw * vec3To4(Vector3.down * 0.1f, 0));
+            if (objtime > 1)
             {
                 if (righthand != null)
                 {
                     Vector3 normal = leapToUnity(righthand.PalmNormal) * 1000;
                     normal = vec4To3(ctw * vec3To4(normal, 0));
                     Vector3 dir = leapToWorld(righthand.PalmPosition) - leaporigin;
-                    if (decideDirection(normal) != Vector3.zero)
-                    {//valid pos
-                        if (!isFist(righthand))
-                        {//translate
-                            if (Physics.Raycast(leaporigin + leftoffset, dir, out info) || Physics.Raycast(leaporigin + rightoffset, dir, out info))
+                    if (!isFist(righthand))
+                    {//translate
+                        if (decideDirection(normal) != Vector3.zero)
+                        {//valid pos
+                            if (detectColli(leftoffset,rightoffset,upoffset,downoffset,dir))
                             {// has target
                                 GameObject target = info.collider.gameObject;
-                                target.GetComponent<Renderer>().material = new Material(Resources.Load("materials/highlightmat", typeof(Material)) as Material);
                                 if (prepos == Vector3.zero)
                                 {//first hit
                                     prepos = leapToWorld(righthand.PalmPosition);
@@ -97,7 +99,7 @@ namespace gam
                                 else
                                 {
                                     if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.05f)
-                                    {
+                                    {//move obj
                                         int id = Int32.Parse(target.transform.parent.gameObject.name);
                                         puzzle p = gameController.GetPuzzle(id);
                                         if (p.startMove(decideDirection(normal)))
@@ -113,20 +115,55 @@ namespace gam
                                 prepos = Vector3.zero;
                             }
                         }
-                        else
-                        {
-                            if (Physics.Raycast(leaporigin + leftoffset, dir, out info) || Physics.Raycast(leaporigin + rightoffset, dir, out info))
+                    }
+                    else
+                    {//rotation
+                        if (righthand.Fingers[0].IsExtended)
+                        {//valid pos
+                            if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
                             {// has target
                                 GameObject target = info.collider.gameObject;
                                 GameObject parent = target.transform.parent.gameObject;
-                                parent.transform.right = -decideDirection(normal);
+                                target.GetComponent<Renderer>().material = new Material(Resources.Load("materials/highlightmat", typeof(Material)) as Material);
+
+                                if (predir == Vector3.zero)
+                                {//firsthit
+                                    predir = normal;
+                                }
+                                else
+                                {
+                                    if (Vector3.Dot(normal, predir) < 0.6)
+                                    {//rot obj
+                                        int id = Int32.Parse(target.transform.parent.gameObject.name);
+                                        puzzle p = gameController.GetPuzzle(id);
+                                        if (p.rotate(findclosestunit(Vector3.Cross(normal, predir))))
+                                        {
+                                            objtime = 0;
+                                        }
+                                        predir = Vector3.zero;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                predir = Vector3.zero;
                             }
                         }
                     }
+
                 }
             }
         }
 
+        bool detectColli(Vector3 left, Vector3 right, Vector3 up, Vector3 down, Vector3 dir)
+        {
+            if(Physics.Raycast(leaporigin + left, dir, out info) || Physics.Raycast(leaporigin + right, dir, out info)||
+                Physics.Raycast(leaporigin + up, dir, out info) || Physics.Raycast(leaporigin + up, dir, out info))
+            {
+                return true;
+            }
+            return false;
+        }
         Vector3 vec4To3(Vector4 v)
         {
             Vector3 res = new Vector3(v.x, v.y, v.z);
@@ -163,6 +200,53 @@ namespace gam
             return Vector3.zero;
         }
 
+        Vector3 findclosestunit(Vector3 v)
+        {
+            float x = Vector3.Dot(v, Vector3.right);
+            float mx = Vector3.Dot(v, Vector3.left);
+            float y = Vector3.Dot(v, Vector3.up);
+            float my = Vector3.Dot(v, Vector3.down);
+            float z = Vector3.Dot(v, Vector3.forward);
+            float mz = Vector3.Dot(v, Vector3.back);
+            float[] t = { x, mx, y, my, z, mz };
+            float max = 0;
+            for(int i = 0; i < 6; i++)
+            {
+                if (t[i] > max)
+                {
+                    max = t[i];
+                }
+            }
+            if (max == x)
+            {
+                return Vector3.right;
+            }
+            if (max == mx)
+            {
+                return Vector3.left;
+            }
+            if (max == y)
+            {
+                return Vector3.up;
+            }
+            if (max == my)
+            {
+                return Vector3.down;
+            }
+            if (max == z)
+            {
+                return Vector3.forward;
+            }
+            if (max == mz)
+            {
+                return Vector3.back;
+            }
+            else
+            {
+                Debug.Log("What!!!");
+                return Vector3.zero;
+            }
+        }
         Vector3 leapToUnity(Leap.Vector v)
         {
             Vector3 result = new Vector3(0, 0, 0);
@@ -193,7 +277,7 @@ namespace gam
                     badfinger++;
                 }
             }
-            if (badfinger > 3)
+            if (badfinger > 1)
             {
                 return true;
             }

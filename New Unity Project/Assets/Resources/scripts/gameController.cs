@@ -61,40 +61,37 @@ namespace gam
         {
             puzzlecount++;
             System.Random rnd = new System.Random();
-            int puzzleindex = rnd.Next(1, numberOfPuzzle + 1);
+            //int puzzleindex = rnd.Next(1, numberOfPuzzle + 1);
+            int puzzleindex = puzzlecount % numberOfPuzzle+1;
             int x = rnd.Next(0, groundsize);
             int z = rnd.Next(0, groundsize - 3);
-            puzzleindex = 2;
             GameObject newpuzzle = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/puzzle" + puzzleindex.ToString()));
-            puzzle newp = new puzzle(newpuzzle, puzzlecount);
             newpuzzle.transform.position = new Vector3(x, groundsize - 2, z);
+            puzzle newp = new puzzle(newpuzzle, puzzlecount);
             for (int i = 0; i < newpuzzle.transform.childCount; i++)
             {
                 GameObject cube = newpuzzle.transform.GetChild(i).gameObject;
-
                 Cube newcub = new Cube(cube,puzzlecount);
                 newp.addCube(newcub);
             }
-            fallingPuzzls.Add(newp);
+            //fallingPuzzls.Add(newp);
             puzzles.Add(newp);
             newpuzzle.name = puzzlecount.ToString();
         }
 
         public bool BeginFallPuzzle()
         {
-            for (int i = fallingPuzzls.Count - 1; i >= 0; i--)
+            for (int i = puzzles.Count - 1; i >= 0; i--)
             {//foreach puzzle
-                if (!fallingPuzzls[i].startMove(Vector3.down))
-                {
-                    fallingPuzzls.RemoveAt(i);
-                }
+                puzzles[i].startMove(Vector3.down);
+               //     fallingPuzzls.RemoveAt(i);
             }
             return true;
         }
 
         public void moveFallingPuzzle()
         {
-            foreach (puzzle m in fallingPuzzls)
+            foreach (puzzle m in puzzles)
             {
                 m.Update();
             }
@@ -183,7 +180,6 @@ namespace gam
                 {
                     for (int k = 0; k < groundsize; k++)
                     {
-                        //Debug.Log (occupied [i,j,k]);
                         if (occupied[i, j, k] != 0)
                         {
                             Debug.Log("coord: " + i.ToString() + " " + j.ToString() + " " + k.ToString() + " val: " + occupied[i, j, k]);

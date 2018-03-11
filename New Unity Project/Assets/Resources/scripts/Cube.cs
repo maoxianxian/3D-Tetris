@@ -9,7 +9,6 @@ namespace gam
         GameObject cub;
         Vector3 coord;
         int id;
-        Vector3 movedir = Vector3.zero;
         public Cube(GameObject obj, int index)
         {
             id = index;
@@ -21,6 +20,7 @@ namespace gam
         public bool checktar(Vector3 tar)
         {
             Vector3 targetcoord = coord + tar;
+
             if (!gameController.valid(targetcoord))
             {
                 return false;
@@ -34,30 +34,37 @@ namespace gam
 
         public void startMove(Vector3 Dir)
         {
-            movedir += Dir;
             Vector3 targetcoord = coord + Dir;
             gameController.unsetGrid(coord);
             gameController.setGrid(targetcoord, id);
             coord = targetcoord;
         }
 
-        public void Update()
+        public bool checkrotate(Vector3 axis, Vector3 realpoint, Vector3 gridpoint)
         {
-            if (movedir.x != 0)
+            GameObject temp = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/rotator"));
+            temp.transform.position = coord;
+            temp.transform.RotateAround(axis, gridpoint, 90);
+            Vector3 targetcor = temp.transform.position;
+            if (!gameController.valid(targetcor))
             {
-                cub.transform.position += Vector3.Normalize(new Vector3(movedir.x, 0, 0))*0.01f;
-                movedir -= Vector3.Normalize(new Vector3(movedir.x, 0, 0)) * 0.01f;
+                return false;
             }
-            if (movedir.y != 0)
+            if (gameController.getGrid(targetcor) != 0 && gameController.getGrid(targetcor) != id)
             {
-                cub.transform.position += Vector3.Normalize(new Vector3(0, movedir.y, 0)) * 0.01f;
-                movedir -= Vector3.Normalize(new Vector3(0, movedir.y, 0)) * 0.01f;
+                return false;
             }
-            if (movedir.z != 0)
-            {
-                cub.transform.position += Vector3.Normalize(new Vector3(0, 0, movedir.z)) * 0.01f;
-                movedir -= Vector3.Normalize(new Vector3(0, 0, movedir.z)) * 0.01f;
-            }
+            return true;
+        }
+
+        public void rotateAround(Vector3 axis, Vector3 realpoint, Vector3 gridpoint)
+        {
+            GameObject temp =(GameObject)GameObject.Instantiate(Resources.Load("prefabs/rotator"));
+            temp.transform.position = coord;
+            temp.transform.RotateAround(axis, gridpoint, 90);
+            gameController.unsetGrid(coord);
+            coord = temp.transform.position;
+            gameController.setGrid(coord, id);
         }
     }
 }
