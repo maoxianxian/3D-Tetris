@@ -16,13 +16,18 @@ namespace gam
         Camera camera;
         RaycastHit info;
         Vector3 prepos = Vector3.zero;
-        Vector3 predir = Vector3.zero;
         gameController gamer;
         LineRenderer debug1;
         LineRenderer debug2;
         float correctpos = 0.9f;
+        GameObject xsphere;
+        GameObject ysphere;
+        GameObject zsphere;
+        UnityEngine.UI.Text xtxt;
+        UnityEngine.UI.Text ytxt;
+        UnityEngine.UI.Text ztxt;
 
-        public handController(gameController game)
+        public handController(gameController game, GameObject xsph,GameObject ysph, GameObject zsph, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt)
         {
             leapspace = GameObject.Find("LeapSpace");
             controller = new Leap.Controller();
@@ -30,6 +35,12 @@ namespace gam
             gamer = game;
             debug1 = DrawLine(Vector3.zero, Vector3.zero, Color.white, 0.05f);
             debug2 = DrawLine(Vector3.zero, Vector3.zero, Color.white, 0.05f);
+            xsphere = xsph;
+            ysphere = ysph;
+            zsphere = zsph;
+            xtxt = xt;
+            ytxt = yt;
+            ztxt = zt;
         }
 
         public void connectToHands()
@@ -74,6 +85,24 @@ namespace gam
 
         public void moveobj()
         {
+            if (righthand != null)
+            {
+                Vector3 palmpos = leapToWorld(righthand.PalmPosition);
+                Vector3 mid = -Vector3.Cross(leapVectorToWorld(righthand.PalmNormal), leapVectorToWorld(righthand.Direction));
+                xsphere.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
+                ysphere.transform.position = palmpos + 0.1f * mid;
+                zsphere.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction);
+                if (lefthand != null) {
+                    Vector3 leftpal= leapVectorToWorld(lefthand.PalmNormal);
+                    xsphere.transform.position = 1.0f*(1.0f * leapToWorld(lefthand.Fingers[1].TipPosition)+0.02f*leftpal)+0.0f*leapToWorld(lefthand.PalmPosition);
+                }
+            }
+            else
+            {
+                xsphere.transform.position = Vector3.zero;
+                ysphere.transform.position = Vector3.zero;
+                zsphere.transform.position = Vector3.zero;
+            }
             objtime += Time.deltaTime;
             leaporigin = leapspace.transform.position;
             Matrix4x4 wtc = camera.worldToCameraMatrix;
@@ -86,14 +115,13 @@ namespace gam
             {
                 if (righthand != null)
                 {
-                    Vector3 normal = leapToUnity(righthand.PalmNormal) * 1000;
-                    normal = vec4To3(ctw * vec3To4(normal, 0));
+                    Vector3 normal = Vector3.Normalize(leapVectorToWorld(righthand.PalmNormal));
                     Vector3 dir = leapToWorld(righthand.PalmPosition) - leaporigin;
-                    if (!isFist(righthand))
+                    if (righthand.Fingers[0].IsExtended)
                     {//translate
                         if (decideDirection(normal) != Vector3.zero)
                         {//valid pos
-                            if (detectColli(leftoffset,rightoffset,upoffset,downoffset,dir))
+                            if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
                             {// has target
                                 GameObject target = info.collider.gameObject;
                                 if (prepos == Vector3.zero)
@@ -108,6 +136,7 @@ namespace gam
                                         puzzle p = gameController.GetPuzzle(id);
                                         if (p.startMove(decideDirection(normal)))
                                         {
+                                            p.highlight();
                                             objtime = 0;
                                         }
                                         prepos = Vector3.zero;
@@ -122,38 +151,62 @@ namespace gam
                     }
                     else
                     {//rotation
-                        if (righthand.Fingers[0].IsExtended)
-                        {//valid pos
-                            if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
-                            {// has target
-                                GameObject target = info.collider.gameObject;
-                                GameObject parent = target.transform.parent.gameObject;
-
-                                if (predir == Vector3.zero)
-                                {//firsthit
-                                    predir = normal;
-                                }
-                                else
+                     //prepos = Vector3.zero;
+                        /*if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
+                        {// has target
+                            GameObject target = info.collider.gameObject;
+                            GameObject parent = target.transform.parent.gameObject;
+                            int id = Int32.Parse(target.transform.parent.gameObject.name);
+                            puzzle p = gameController.GetPuzzle(id);
+                            Vector3 hitpoint=info.point;
+                            if (righthand.GrabStrength > 0.8f)
+                            {
+                                p.highlight();
+                                if(findclosestunit(normal) == Vector3.down)
                                 {
-                                    if (Vector3.Dot(normal, predir) < 0.6)
-                                    {//rot obj
-                                        int id = Int32.Parse(target.transform.parent.gameObject.name);
-                                        puzzle p = gameController.GetPuzzle(id);
-                                        if (p.rotate(findclosestunit(Vector3.Cross(predir, normal))))
-                                        {
-                                            objtime = 0;
-                                        }
-                                        predir = Vector3.zero;
+                                    if (p.rotate(Vector3.right))
+                                    {
+                                        objtime = 0;
                                     }
                                 }
-                                debug1.SetPosition(0, leapToWorld(righthand.PalmPosition));
-                                debug1.SetPosition(1, leapToWorld(righthand.PalmPosition) + normal);
-                                debug2.SetPosition(0, leapToWorld(righthand.PalmPosition));
-                                debug2.SetPosition(1, leapToWorld(righthand.PalmPosition) + predir);
+                                if (findclosestunit(normal) == Vector3.up)
+                                {
+                                    if (p.rotate(Vector3.left))
+                                    {
+                                        objtime = 0;
+                                    }
+                                }
+                                if (findclosestunit(normal) == Vector3.left)
+                                {
+                                    if (p.rotate(Vector3.up))
+                                    {
+                                        objtime = 0;
+                                    }
+                                }
+                                if (findclosestunit(normal) == Vector3.right)
+                                {
+                                    if (p.rotate(Vector3.down))
+                                    {
+                                        objtime = 0;
+                                    }
+                                }
+                                if (findclosestunit(normal) == Vector3.forward)
+                                {
+                                    if (p.rotate(Vector3.right))
+                                    {
+                                        objtime = 0;
+                                    }
+                                }
+                                if (findclosestunit(normal) == Vector3.back)
+                                {
+                                    if (p.rotate(Vector3.left))
+                                    {
+                                        objtime = 0;
+                                    }
+                                }
                             }
-                        }
+                        }*/
                     }
-
                 }
             }
         }
@@ -253,9 +306,9 @@ namespace gam
         Vector3 leapToUnity(Leap.Vector v)
         {
             Vector3 result = new Vector3(0, 0, 0);
-            result.x = -v.x / 1000.0f;
-            result.y = -v.z / 1000.0f;
-            result.z = -v.y / 1000.0f;
+            result.x = -v.x;
+            result.y = -v.z;
+            result.z = -v.y;
             return result;
         }
 
@@ -263,10 +316,20 @@ namespace gam
         {
             Matrix4x4 m = camera.cameraToWorldMatrix;
             //Vector4 camori = m * new Vector4 (0, 0, 0, 1);
-            Vector3 temp = leapToUnity(v);
+            Vector3 temp = leapToUnity(v)/1000.0f;
             Vector4 cameravec = m * new Vector4(temp.x, temp.y, temp.z, 0);
             Vector3 res = new Vector3(cameravec[0], cameravec[1], cameravec[2]);
             res = res + leaporigin;
+            return res;
+        }
+
+        Vector3 leapVectorToWorld(Leap.Vector v)
+        {
+            Matrix4x4 m = camera.cameraToWorldMatrix;
+            //Vector4 camori = m * new Vector4 (0, 0, 0, 1);
+            Vector3 temp = leapToUnity(v);
+            Vector4 cameravec = m * new Vector4(temp.x, temp.y, temp.z, 0);
+            Vector3 res = new Vector3(cameravec[0], cameravec[1], cameravec[2]);
             return res;
         }
 

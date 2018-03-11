@@ -25,7 +25,6 @@ namespace gam {
 
         public bool startMove(Vector3 dir)
         {
-            
             foreach (Cube c in cubes)
             {
                 if (!c.checktar(dir))
@@ -52,7 +51,6 @@ namespace gam {
                     return false;
                 }
             }
-            Debug.Log("start rotate");
             foreach (Cube c in cubes)
             {
                 c.rotateAround(axis, coord);
@@ -80,12 +78,13 @@ namespace gam {
             if (movedir == Vector3.zero)
             {
                 puz.transform.position = coord;
+                dehighlight();
             }
         }
 
         public void highlight()
         {
-            Material mat = Resources.Load("material/highlightmat", typeof(Material)) as Material;
+            Material mat = Resources.Load("materials/highlightmat", typeof(Material)) as Material;
             foreach (Cube c in cubes)
             {
                 c.highlight(mat);

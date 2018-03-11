@@ -27,6 +27,9 @@ namespace gam
         int numberOfPuzzle;
         int playerid = 999;
         int puzzlecount = 0;
+        int timePerGenerate = 6;//how long to generate a puzzle
+        float generatetime;
+
         //List<ObjectMover> movers;
         static List<puzzle> puzzles;
         public gameController(int size, GameObject playerOb, int numberOfP)
@@ -37,6 +40,8 @@ namespace gam
             occupied = new int[size, size, size];
             player = playerOb;
             numberOfPuzzle = numberOfP;
+            timePerGenerate = 3 * groundsize;
+            generatetime = timePerGenerate-3;
         }
 
         public void CreateEnvironment()
@@ -59,32 +64,45 @@ namespace gam
 
         public void generatePuzzle()
         {
-            puzzlecount++;
-            System.Random rnd = new System.Random();
-            //int puzzleindex = rnd.Next(1, numberOfPuzzle + 1);
-            int puzzleindex = puzzlecount % numberOfPuzzle+1;
-            int x = rnd.Next(0, groundsize);
-            int z = rnd.Next(0, groundsize - 3);
-            GameObject newpuzzle = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/puzzle" + puzzleindex.ToString()));
-            newpuzzle.transform.position = new Vector3(x, groundsize - 2, z);
-            puzzle newp = new puzzle(newpuzzle, puzzlecount);
-            for (int i = 0; i < newpuzzle.transform.childCount; i++)
+            generatetime += Time.deltaTime;
+            if (generatetime > timePerGenerate)
             {
-                GameObject cube = newpuzzle.transform.GetChild(i).gameObject;
-                Cube newcub = new Cube(cube,puzzlecount);
-                newp.addCube(newcub);
+                generatetime = 0;
+
+                puzzlecount++;
+                System.Random rnd = new System.Random();
+                //int puzzleindex = rnd.Next(1, numberOfPuzzle + 1);
+                int puzzleindex = puzzlecount % numberOfPuzzle + 1;
+                int x = rnd.Next(0, groundsize);
+                int z = rnd.Next(0, groundsize - 3);
+                GameObject newpuzzle = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/puzzle" + puzzleindex.ToString()));
+                newpuzzle.transform.position = new Vector3(x, groundsize - 2, z);
+                puzzle newp = new puzzle(newpuzzle, puzzlecount);
+                for (int i = 0; i < newpuzzle.transform.childCount; i++)
+                {
+                    GameObject cube = newpuzzle.transform.GetChild(i).gameObject;
+                    Cube newcub = new Cube(cube, puzzlecount);
+                    newp.addCube(newcub);
+                }
+                //fallingPuzzls.Add(newp);
+                puzzles.Add(newp);
+                newpuzzle.name = puzzlecount.ToString();
             }
-            //fallingPuzzls.Add(newp);
-            puzzles.Add(newp);
-            newpuzzle.name = puzzlecount.ToString();
         }
 
         public bool BeginFallPuzzle()
         {
+            bool gene = true;
             for (int i = puzzles.Count - 1; i >= 0; i--)
             {//foreach puzzle
-                puzzles[i].startMove(Vector3.down);
-               //     fallingPuzzls.RemoveAt(i);
+                if (puzzles[i].startMove(Vector3.down))
+                {
+                    gene = false;
+                }
+            }
+            if (gene)
+            {
+                generatetime = timePerGenerate;
             }
             return true;
         }
