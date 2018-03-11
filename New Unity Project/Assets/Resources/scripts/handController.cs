@@ -18,6 +18,8 @@ namespace gam
         Vector3 prepos = Vector3.zero;
         Vector3 predir = Vector3.zero;
         gameController gamer;
+        LineRenderer debug1;
+        LineRenderer debug2;
         float correctpos = 0.9f;
 
         public handController(gameController game)
@@ -26,6 +28,8 @@ namespace gam
             controller = new Leap.Controller();
             camera = GameObject.Find("CenterEyeAnchor").GetComponent<Camera>();
             gamer = game;
+            debug1 = DrawLine(Vector3.zero, Vector3.zero, Color.white, 0.05f);
+            debug2 = DrawLine(Vector3.zero, Vector3.zero, Color.white, 0.05f);
         }
 
         public void connectToHands()
@@ -124,7 +128,6 @@ namespace gam
                             {// has target
                                 GameObject target = info.collider.gameObject;
                                 GameObject parent = target.transform.parent.gameObject;
-                                target.GetComponent<Renderer>().material = new Material(Resources.Load("materials/highlightmat", typeof(Material)) as Material);
 
                                 if (predir == Vector3.zero)
                                 {//firsthit
@@ -136,17 +139,17 @@ namespace gam
                                     {//rot obj
                                         int id = Int32.Parse(target.transform.parent.gameObject.name);
                                         puzzle p = gameController.GetPuzzle(id);
-                                        if (p.rotate(findclosestunit(Vector3.Cross(normal, predir))))
+                                        if (p.rotate(findclosestunit(Vector3.Cross(predir, normal))))
                                         {
                                             objtime = 0;
                                         }
                                         predir = Vector3.zero;
                                     }
                                 }
-                            }
-                            else
-                            {
-                                predir = Vector3.zero;
+                                debug1.SetPosition(0, leapToWorld(righthand.PalmPosition));
+                                debug1.SetPosition(1, leapToWorld(righthand.PalmPosition) + normal);
+                                debug2.SetPosition(0, leapToWorld(righthand.PalmPosition));
+                                debug2.SetPosition(1, leapToWorld(righthand.PalmPosition) + predir);
                             }
                         }
                     }

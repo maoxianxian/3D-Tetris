@@ -8,8 +8,10 @@ namespace gam {
         List<Cube> cubes;
         Vector3 coord;
         Vector3 movedir;
+        Material puzzlemat;
         public puzzle(GameObject obj, int ind)
         {
+            puzzlemat = obj.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
             coord = obj.transform.position;
             cubes = new List<Cube>();
             puz = obj;
@@ -23,7 +25,8 @@ namespace gam {
 
         public bool startMove(Vector3 dir)
         {
-            foreach(Cube c in cubes)
+            
+            foreach (Cube c in cubes)
             {
                 if (!c.checktar(dir))
                 {
@@ -34,6 +37,7 @@ namespace gam {
             {
                 c.startMove(dir);
             }
+            
             movedir += dir;
             coord = coord + dir;
             return true;
@@ -43,7 +47,7 @@ namespace gam {
         {
             foreach (Cube c in cubes)
             {
-                if (!c.checkrotate(axis,puz.transform.position,coord))
+                if (!c.checkrotate(axis, coord))
                 {
                     return false;
                 }
@@ -51,7 +55,7 @@ namespace gam {
             Debug.Log("start rotate");
             foreach (Cube c in cubes)
             {
-                c.rotateAround(axis, puz.transform.position, coord);
+                c.rotateAround(axis, coord);
             }
             puz.transform.RotateAround(puz.transform.position,axis,90);
             return true;
@@ -76,6 +80,23 @@ namespace gam {
             if (movedir == Vector3.zero)
             {
                 puz.transform.position = coord;
+            }
+        }
+
+        public void highlight()
+        {
+            Material mat = Resources.Load("material/highlightmat", typeof(Material)) as Material;
+            foreach (Cube c in cubes)
+            {
+                c.highlight(mat);
+            }
+        }
+
+        public void dehighlight()
+        {
+            foreach (Cube c in cubes)
+            {
+                c.highlight(puzzlemat);
             }
         }
     }

@@ -193,7 +193,7 @@ namespace gam
         {
             for (int i = 0; i < 3; i++)
             {
-                if (cood[i] < 0 || cood[i] == occupied.GetLength(1))
+                if (cood[i] < 0 || cood[i] >= occupied.GetLength(1))
                 {
                     return false;
                 }

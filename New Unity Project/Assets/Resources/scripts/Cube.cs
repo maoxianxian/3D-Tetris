@@ -40,12 +40,14 @@ namespace gam
             coord = targetcoord;
         }
 
-        public bool checkrotate(Vector3 axis, Vector3 realpoint, Vector3 gridpoint)
+        public bool checkrotate(Vector3 axis, Vector3 gridpoint)
         {
+            Debug.Log("checking");
             GameObject temp = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/rotator"));
             temp.transform.position = coord;
-            temp.transform.RotateAround(axis, gridpoint, 90);
+            temp.transform.RotateAround(gridpoint, axis, 90.0f);
             Vector3 targetcor = temp.transform.position;
+            Debug.Log(targetcor);
             if (!gameController.valid(targetcor))
             {
                 return false;
@@ -57,14 +59,21 @@ namespace gam
             return true;
         }
 
-        public void rotateAround(Vector3 axis, Vector3 realpoint, Vector3 gridpoint)
+        public void rotateAround(Vector3 axis, Vector3 gridpoint)
         {
+            //Debug.Log("axis " + axis.ToString());
+            //Debug.Log(gridpoint.ToString());
             GameObject temp =(GameObject)GameObject.Instantiate(Resources.Load("prefabs/rotator"));
             temp.transform.position = coord;
-            temp.transform.RotateAround(axis, gridpoint, 90);
+            temp.transform.RotateAround(gridpoint, axis, 90.0f);
             gameController.unsetGrid(coord);
             coord = temp.transform.position;
             gameController.setGrid(coord, id);
+        }
+
+        public void highlight(Material mat)
+        {
+            cub.GetComponent<Renderer>().material = mat;
         }
     }
 }
