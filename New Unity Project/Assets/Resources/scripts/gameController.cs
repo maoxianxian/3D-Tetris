@@ -90,6 +90,16 @@ namespace gam
             }
         }
 
+        public void moveplayer(Vector3 dir)
+        {
+            if (valid(player.transform.position + dir)&&getGrid(player.transform.position+dir)==0)
+            {
+                unsetGrid(player.transform.position);
+                player.transform.position += dir;
+                setGrid(player.transform.position, playerid);
+                playercoord = player.transform.position;
+            }
+        }
         public bool BeginFallPuzzle()
         {
             bool gene = true;

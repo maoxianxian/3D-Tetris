@@ -26,7 +26,12 @@ namespace gam
         UnityEngine.UI.Text xtxt;
         UnityEngine.UI.Text ytxt;
         UnityEngine.UI.Text ztxt;
+        bool translate = true;
+        public static handController getctr;
+        float movetime = 0;
+        float switchtime = 0;
 
+        Vector3 leftprepos=Vector3.zero;
         public handController(gameController game, GameObject xsph,GameObject ysph, GameObject zsph, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt)
         {
             leapspace = GameObject.Find("LeapSpace");
@@ -41,6 +46,7 @@ namespace gam
             xtxt = xt;
             ytxt = yt;
             ztxt = zt;
+            getctr = this;
         }
 
         public void connectToHands()
@@ -85,6 +91,7 @@ namespace gam
 
         public void moveobj()
         {
+            switchtime+=Time.deltaTime;
             if (righthand != null)
             {
                 Vector3 palmpos = leapToWorld(righthand.PalmPosition);
@@ -92,10 +99,7 @@ namespace gam
                 xsphere.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
                 ysphere.transform.position = palmpos + 0.1f * mid;
                 zsphere.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction);
-                if (lefthand != null) {
-                    Vector3 leftpal= leapVectorToWorld(lefthand.PalmNormal);
-                    xsphere.transform.position = 1.0f*(1.0f * leapToWorld(lefthand.Fingers[1].TipPosition)+0.02f*leftpal)+0.0f*leapToWorld(lefthand.PalmPosition);
-                }
+                
             }
             else
             {
@@ -117,7 +121,7 @@ namespace gam
                 {
                     Vector3 normal = Vector3.Normalize(leapVectorToWorld(righthand.PalmNormal));
                     Vector3 dir = leapToWorld(righthand.PalmPosition) - leaporigin;
-                    if (righthand.Fingers[0].IsExtended)
+                    if (translate)
                     {//translate
                         if (decideDirection(normal) != Vector3.zero)
                         {//valid pos
@@ -152,7 +156,7 @@ namespace gam
                     else
                     {//rotation
                      //prepos = Vector3.zero;
-                        /*if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
+                        if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
                         {// has target
                             GameObject target = info.collider.gameObject;
                             GameObject parent = target.transform.parent.gameObject;
@@ -162,61 +166,64 @@ namespace gam
                             if (righthand.GrabStrength > 0.8f)
                             {
                                 p.highlight();
-                                if(findclosestunit(normal) == Vector3.down)
+                                Vector3 ax = Vector3.Cross(leapVectorToWorld(righthand.Direction), leapVectorToWorld(righthand.PalmNormal));
+                                if (p.rotate(findclosestunit(ax)))
                                 {
-                                    if (p.rotate(Vector3.right))
-                                    {
-                                        objtime = 0;
-                                    }
-                                }
-                                if (findclosestunit(normal) == Vector3.up)
-                                {
-                                    if (p.rotate(Vector3.left))
-                                    {
-                                        objtime = 0;
-                                    }
-                                }
-                                if (findclosestunit(normal) == Vector3.left)
-                                {
-                                    if (p.rotate(Vector3.up))
-                                    {
-                                        objtime = 0;
-                                    }
-                                }
-                                if (findclosestunit(normal) == Vector3.right)
-                                {
-                                    if (p.rotate(Vector3.down))
-                                    {
-                                        objtime = 0;
-                                    }
-                                }
-                                if (findclosestunit(normal) == Vector3.forward)
-                                {
-                                    if (p.rotate(Vector3.right))
-                                    {
-                                        objtime = 0;
-                                    }
-                                }
-                                if (findclosestunit(normal) == Vector3.back)
-                                {
-                                    if (p.rotate(Vector3.left))
-                                    {
-                                        objtime = 0;
-                                    }
+                                    objtime = 0;
                                 }
                             }
-                        }*/
+                        }
+                    }
+                }
+            }
+            movetime += Time.deltaTime;
+            if (movetime > 1)
+            {
+                if (lefthand != null)
+                {
+                    if (isFist(lefthand))
+                    {
+                        if (leftprepos == Vector3.zero)
+                        {
+                            leftprepos = leapToWorld(lefthand.PalmPosition);
+                        }
+                        else
+                        {
+                            if ((leftprepos - leapToWorld(lefthand.PalmPosition)).magnitude > 0.15f)
+                            {
+                                Vector3 dir = findclosestunit(leftprepos - leapToWorld(lefthand.PalmPosition));
+                                gamer.moveplayer(dir);
+                                leftprepos = Vector3.zero;
+                                movetime = 0;
+                            }
+                        }
                     }
                 }
             }
         }
 
+        public bool switchmode()
+        {
+            if (switchtime > 1)
+            {
+                switchtime = 0;
+                translate = !translate;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         bool detectColli(Vector3 left, Vector3 right, Vector3 up, Vector3 down, Vector3 dir)
         {
             if(Physics.Raycast(leaporigin + left, dir, out info) || Physics.Raycast(leaporigin + right, dir, out info)||
                 Physics.Raycast(leaporigin + up, dir, out info) || Physics.Raycast(leaporigin + up, dir, out info))
             {
-                return true;
+                if (info.collider.gameObject.tag != "button"&&info.collider.gameObject.transform.parent.gameObject.tag=="puzzle")
+                {
+                    return true;
+                }
             }
             return false;
         }
