@@ -6,9 +6,7 @@ namespace gam
     public class Main : MonoBehaviour
     {
         int groundsize = 6;
-        float movetime = 0;
         int numberOfPuzzle = 5;
-        int timeperunit = 3;//time a cube spend on one unit
         gameController controller;
         GameObject player;
         handController hands;
@@ -32,15 +30,7 @@ namespace gam
         // Update is called once per frame
         void Update()
         {
-            movetime += Time.deltaTime;
-            controller.generatePuzzle();
-            if (movetime > timeperunit)
-            {
-                movetime = 0;
-                controller.BeginFallPuzzle();
-            }
-            controller.moveFallingPuzzle();
-
+            controller.Update();
             hands.connectToHands();
             hands.moveobj();
         }

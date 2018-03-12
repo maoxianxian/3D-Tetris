@@ -15,7 +15,6 @@ namespace gam
                 new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,2),	new Vector3(0,1,1),				
                 new Vector3(0,1,0),	new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,1)
             };*/
-        List<puzzle> fallingPuzzls;
         static int[,,] occupied;
         static int groundsize;
         GameObject player;
@@ -29,19 +28,23 @@ namespace gam
         int puzzlecount = 0;
         int timePerGenerate = 6;//how long to generate a puzzle
         float generatetime;
+        float movetime = 0;
+        int timeperunit = 3;//time a cube spend on one unit
+
 
         //List<ObjectMover> movers;
         static List<puzzle> puzzles;
+        public static gameController ctr;
         public gameController(int size, GameObject playerOb, int numberOfP)
         {
             puzzles = new List<puzzle>();
             groundsize = size;
-            fallingPuzzls = new List<puzzle>();
             occupied = new int[size, size, size];
             player = playerOb;
             numberOfPuzzle = numberOfP;
-            timePerGenerate = 3 * groundsize;
+            timePerGenerate = timeperunit * groundsize;
             generatetime = timePerGenerate-3;
+            ctr = this;
         }
 
         public void CreateEnvironment()
@@ -119,16 +122,56 @@ namespace gam
 
         public void moveFallingPuzzle()
         {
+            movetime += Time.deltaTime;
+            if (movetime > timeperunit)
+            {
+                movetime = 0;
+                if (checkMat())
+                {
+                    foreach(puzzle p in puzzles)
+                    {
+                        p.destroybuttom();
+                    }
+                }
+                BeginFallPuzzle();
+            }
             foreach (puzzle m in puzzles)
             {
                 m.Update();
             }
         }
 
-       /* public void addMover(ObjectMover mover)
+        public void expandgrid() {
+            while (puzzles.Count != 0)
+            {
+                removepuzzle(0);
+            }
+            groundsize = groundsize++;
+            occupied = new int[groundsize, groundsize, groundsize];
+            timePerGenerate = timeperunit * groundsize;
+            generatetime = timePerGenerate - 3;
+        }
+        public void smallergrid()
         {
-            movers.Add(mover);
-        }*/
+            while (puzzles.Count != 0)
+            {
+                removepuzzle(0);
+            }
+            groundsize = groundsize--;
+            occupied = new int[groundsize, groundsize, groundsize];
+            timePerGenerate = timeperunit * groundsize;
+            generatetime = timePerGenerate - 3;
+        }
+        public void removepuzzle(int i)
+        {
+            puzzles[i].destroy();
+            puzzles.RemoveAt(i);
+        }
+        public void Update()
+        {
+            generatePuzzle();
+            moveFallingPuzzle();
+        }
 
         public int[,,] getGrid()
         {

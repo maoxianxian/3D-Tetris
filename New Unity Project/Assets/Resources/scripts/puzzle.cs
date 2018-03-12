@@ -5,7 +5,7 @@ namespace gam {
     public class puzzle {
         GameObject puz;
         int id;
-        List<Cube> cubes;
+        public List<Cube> cubes;
         Vector3 coord;
         Vector3 movedir;
         Material puzzlemat;
@@ -97,6 +97,36 @@ namespace gam {
             {
                 c.highlight(puzzlemat);
             }
+        }
+
+        public void destroybuttom()
+        {
+            for(int i = cubes.Count - 1; i >= 0; i--)
+            {
+                if (cubes[i].coord.y == 0)
+                {
+                    Cube temp = cubes[i];
+                    gameController.unsetGrid(temp.coord);
+                    cubes.RemoveAt(i);
+                    GameObject.Destroy(temp.cub);
+                }
+            }
+        }
+
+        public void destroy()
+        {
+            for (int i = cubes.Count - 1; i >= 0; i--)
+            {
+                Cube temp = cubes[i];
+                gameController.unsetGrid(temp.coord);
+                cubes.RemoveAt(i);
+                GameObject.Destroy(temp.cub);
+            }
+        }
+
+        public void destroy(Vector3 coord)
+        {
+
         }
     }
 }

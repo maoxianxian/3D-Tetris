@@ -6,8 +6,8 @@ namespace gam
 {
     public class Cube
     {
-        GameObject cub;
-        Vector3 coord;
+        public GameObject cub;
+        public Vector3 coord;
         int id;
         public Cube(GameObject obj, int index)
         {
