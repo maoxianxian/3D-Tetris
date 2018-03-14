@@ -6,6 +6,7 @@ TagManager:
   tags:
   - puzzle
   - button
+  - wall
   layers:
   - Default
   - TransparentFX

@@ -30,13 +30,16 @@ namespace gam
         float generatetime;
         float movetime = 0;
         int timeperunit = 3;//time a cube spend on one unit
-
-
+        puzzle curr;
+        UnityEngine.UI.Text gg;
+        GameObject bomb;
+        GameObject origin;
         //List<ObjectMover> movers;
         static List<puzzle> puzzles;
         public static gameController ctr;
-        public gameController(int size, GameObject playerOb, int numberOfP)
+        public gameController(int size, GameObject playerOb, int numberOfP, UnityEngine.UI.Text g)
         {
+            bomb = GameObject.Find("Bomb");
             puzzles = new List<puzzle>();
             groundsize = size;
             occupied = new int[size, size, size];
@@ -45,6 +48,9 @@ namespace gam
             timePerGenerate = timeperunit * groundsize;
             generatetime = timePerGenerate-3;
             ctr = this;
+            gg = g;
+            gg.enabled = false;
+            origin = player.transform.GetChild(0).gameObject;
         }
 
         public void CreateEnvironment()
@@ -81,18 +87,24 @@ namespace gam
                 GameObject newpuzzle = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/puzzle" + puzzleindex.ToString()));
                 newpuzzle.transform.position = new Vector3(x, groundsize - 2, z);
                 puzzle newp = new puzzle(newpuzzle, puzzlecount);
+                newp.type = puzzleindex;
                 for (int i = 0; i < newpuzzle.transform.childCount; i++)
                 {
                     GameObject cube = newpuzzle.transform.GetChild(i).gameObject;
+                    if (getGrid(cube.transform.position) != 0)
+                    {
+                        gameover();
+                    }
                     Cube newcub = new Cube(cube, puzzlecount);
                     newp.addCube(newcub);
                 }
                 //fallingPuzzls.Add(newp);
                 puzzles.Add(newp);
+                curr = newp;
                 newpuzzle.name = puzzlecount.ToString();
             }
         }
-
+        
         public void moveplayer(Vector3 dir)
         {
             if (valid(player.transform.position + dir)&&getGrid(player.transform.position+dir)==0)
@@ -119,9 +131,15 @@ namespace gam
             }
             return true;
         }
-
+        public void gameover()
+        {
+            gg.enabled = true;
+            gg.transform.position = origin.transform.position + 0.5f*origin.transform.forward;
+            gg.transform.forward = origin.transform.forward;
+        }
         public void moveFallingPuzzle()
         {
+            bomb.transform.position = origin.transform.position + new Vector3(0, -0.3f, 0)+ 0.1f*origin.transform.forward; 
             movetime += Time.deltaTime;
             if (movetime > timeperunit)
             {
@@ -141,15 +159,65 @@ namespace gam
             }
         }
 
+        public bool randomRotCur()
+        {
+            if (curr != null)
+            {
+                int rotint;
+                System.Random rnd = new System.Random();
+                if (curr.type == 3)
+                {
+                    rotint = rnd.Next(1, 5);
+                }
+                else if (curr.type == 5)
+                {
+                    rotint = rnd.Next(1,3)+2;
+                }
+                else
+                {
+                    rotint = rnd.Next(1, 7);
+                }
+                Vector3 rotaxi=Vector3.zero;
+                if (rotint == 1)
+                {
+                    rotaxi = Vector3.left;
+                }
+                if (rotint == 2)
+                {
+                    rotaxi = Vector3.right;
+                }
+                if (rotint == 3)
+                {
+                    rotaxi = Vector3.forward;
+                }
+                if (rotint == 4)
+                {
+                    rotaxi = Vector3.back;
+                }
+                if (rotint == 5)
+                {
+                    rotaxi = Vector3.up;
+                }
+                if (rotint == 6)
+                {
+                    rotaxi = Vector3.down;
+                }
+                return curr.rotate(rotaxi);
+            }
+            return false;
+        }
         public void expandgrid() {
             while (puzzles.Count != 0)
             {
                 removepuzzle(0);
             }
-            groundsize = groundsize++;
+            groundsize++;
+            puzzlecount = 0;
             occupied = new int[groundsize, groundsize, groundsize];
             timePerGenerate = timeperunit * groundsize;
             generatetime = timePerGenerate - 3;
+            destroywall();
+            CreateEnvironment();
         }
         public void smallergrid()
         {
@@ -157,10 +225,21 @@ namespace gam
             {
                 removepuzzle(0);
             }
-            groundsize = groundsize--;
+            groundsize--;
+            puzzlecount = 0;
             occupied = new int[groundsize, groundsize, groundsize];
             timePerGenerate = timeperunit * groundsize;
             generatetime = timePerGenerate - 3;
+            destroywall();
+            CreateEnvironment();
+        }
+        void destroywall()
+        {
+            GameObject[] t=GameObject.FindGameObjectsWithTag("wall");
+            for(int i = t.Length - 1; i >= 0; i--)
+            {
+                GameObject.Destroy(t[i]);
+            }
         }
         public void removepuzzle(int i)
         {

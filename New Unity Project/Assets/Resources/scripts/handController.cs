@@ -20,19 +20,22 @@ namespace gam
         LineRenderer debug1;
         LineRenderer debug2;
         float correctpos = 0.9f;
-        GameObject xsphere;
-        GameObject ysphere;
-        GameObject zsphere;
-        UnityEngine.UI.Text xtxt;
-        UnityEngine.UI.Text ytxt;
-        UnityEngine.UI.Text ztxt;
+        GameObject sphereswitch;
+        GameObject sphererand;
+        GameObject sphereexpand;
+        GameObject spheresmall;
+
+        UnityEngine.UI.Text txt1;
+        UnityEngine.UI.Text txt2;
+        UnityEngine.UI.Text txt3;
+        UnityEngine.UI.Text txt4;
         bool translate = true;
         public static handController getctr;
         float movetime = 0;
         float switchtime = 0;
 
         Vector3 leftprepos=Vector3.zero;
-        public handController(gameController game, GameObject xsph,GameObject ysph, GameObject zsph, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt)
+        public handController(gameController game, GameObject sph1,GameObject sph2, GameObject sph3,GameObject sph4, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt, UnityEngine.UI.Text wt)
         {
             leapspace = GameObject.Find("LeapSpace");
             controller = new Leap.Controller();
@@ -40,12 +43,14 @@ namespace gam
             gamer = game;
             debug1 = DrawLine(Vector3.zero, Vector3.zero, Color.white, 0.05f);
             debug2 = DrawLine(Vector3.zero, Vector3.zero, Color.white, 0.05f);
-            xsphere = xsph;
-            ysphere = ysph;
-            zsphere = zsph;
-            xtxt = xt;
-            ytxt = yt;
-            ztxt = zt;
+            sphereswitch = sph1;
+            sphererand = sph2;
+            sphereexpand = sph3;
+            spheresmall = sph4;
+            txt1 = xt;
+            txt2 = yt;
+            txt3 = zt;
+            txt4 = wt;
             getctr = this;
         }
 
@@ -94,18 +99,32 @@ namespace gam
             switchtime+=Time.deltaTime;
             if (righthand != null)
             {
+                GameObject player=GameObject.Find("CenterEyeAnchor");
                 Vector3 palmpos = leapToWorld(righthand.PalmPosition);
                 Vector3 mid = -Vector3.Cross(leapVectorToWorld(righthand.PalmNormal), leapVectorToWorld(righthand.Direction));
-                xsphere.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
-                ysphere.transform.position = palmpos + 0.1f * mid;
-                zsphere.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction);
-                
+                sphereswitch.transform.position = palmpos + 0.1f * mid + 0.1f * leapVectorToWorld(righthand.Direction);
+                sphererand.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
+                sphereexpand.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction); ;
+                spheresmall.transform.position = palmpos + 0.1f * mid - 0.1f * leapVectorToWorld(righthand.Direction);
+                txt1.transform.position = sphereswitch.transform.position + 0.1f * mid ;
+                txt1.transform.forward = player.transform.forward;
+                txt2.transform.position = sphererand.transform.position + 0.1f * mid ;
+                txt2.transform.forward = player.transform.forward;
+                txt3.transform.position = sphereexpand.transform.position + 0.1f * mid ;
+                txt3.transform.forward = player.transform.forward;
+                txt4.transform.position = spheresmall.transform.position + 0.1f * mid ;
+                txt4.transform.forward = player.transform.forward;
             }
             else
             {
-                xsphere.transform.position = Vector3.zero;
-                ysphere.transform.position = Vector3.zero;
-                zsphere.transform.position = Vector3.zero;
+                sphererand.transform.position = Vector3.zero;
+                sphereswitch.transform.position = Vector3.zero;
+                sphereexpand.transform.position = Vector3.zero;
+                spheresmall.transform.position = Vector3.zero;
+                txt1.transform.position = Vector3.zero;
+                txt2.transform.position = Vector3.zero;
+                txt3.transform.position = Vector3.zero;
+                txt4.transform.position = Vector3.zero;
             }
             objtime += Time.deltaTime;
             leaporigin = leapspace.transform.position;
@@ -134,7 +153,7 @@ namespace gam
                                 }
                                 else
                                 {
-                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.05f)
+                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.09f)
                                     {//move obj
                                         int id = Int32.Parse(target.transform.parent.gameObject.name);
                                         puzzle p = gameController.GetPuzzle(id);

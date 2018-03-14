@@ -4,7 +4,8 @@ using UnityEngine;
 namespace gam {
     public class puzzle {
         GameObject puz;
-        int id;
+        public int id;
+        public int type;
         public List<Cube> cubes;
         Vector3 coord;
         Vector3 movedir;
@@ -41,7 +42,7 @@ namespace gam {
             coord = coord + dir;
             return true;
         }
-
+        
         public bool rotate(Vector3 axis)
         {
             foreach (Cube c in cubes)
