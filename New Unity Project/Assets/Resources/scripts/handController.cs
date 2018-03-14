@@ -30,7 +30,9 @@ namespace gam
         UnityEngine.UI.Text txt3;
         UnityEngine.UI.Text txt4;
         bool translate = true;
+        public bool release = false;
         public static handController getctr;
+        public GameObject bomb;
         float movetime = 0;
         float switchtime = 0;
 
@@ -92,40 +94,20 @@ namespace gam
             }
         }
 
-
-
-        public void moveobj()
+        public void addBomb(GameObject bomb)
+        {
+            if (this.bomb == null)
+            {
+                bomb.transform.position = leapToWorld(lefthand.PalmPosition);
+                this.bomb = bomb;
+                release = false;
+            }
+        }
+        public void Update()
         {
             switchtime+=Time.deltaTime;
-            if (righthand != null)
-            {
-                GameObject player=GameObject.Find("CenterEyeAnchor");
-                Vector3 palmpos = leapToWorld(righthand.PalmPosition);
-                Vector3 mid = -Vector3.Cross(leapVectorToWorld(righthand.PalmNormal), leapVectorToWorld(righthand.Direction));
-                sphereswitch.transform.position = palmpos + 0.1f * mid + 0.1f * leapVectorToWorld(righthand.Direction);
-                sphererand.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
-                sphereexpand.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction); ;
-                spheresmall.transform.position = palmpos + 0.1f * mid - 0.1f * leapVectorToWorld(righthand.Direction);
-                txt1.transform.position = sphereswitch.transform.position + 0.1f * mid ;
-                txt1.transform.forward = player.transform.forward;
-                txt2.transform.position = sphererand.transform.position + 0.1f * mid ;
-                txt2.transform.forward = player.transform.forward;
-                txt3.transform.position = sphereexpand.transform.position + 0.1f * mid ;
-                txt3.transform.forward = player.transform.forward;
-                txt4.transform.position = spheresmall.transform.position + 0.1f * mid ;
-                txt4.transform.forward = player.transform.forward;
-            }
-            else
-            {
-                sphererand.transform.position = Vector3.zero;
-                sphereswitch.transform.position = Vector3.zero;
-                sphereexpand.transform.position = Vector3.zero;
-                spheresmall.transform.position = Vector3.zero;
-                txt1.transform.position = Vector3.zero;
-                txt2.transform.position = Vector3.zero;
-                txt3.transform.position = Vector3.zero;
-                txt4.transform.position = Vector3.zero;
-            }
+            displayarmwidget();
+            updatebomb();
             objtime += Time.deltaTime;
             leaporigin = leapspace.transform.position;
             Matrix4x4 wtc = camera.worldToCameraMatrix;
@@ -153,7 +135,7 @@ namespace gam
                                 }
                                 else
                                 {
-                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.09f)
+                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.07f)
                                     {//move obj
                                         int id = Int32.Parse(target.transform.parent.gameObject.name);
                                         puzzle p = gameController.GetPuzzle(id);
@@ -221,6 +203,52 @@ namespace gam
             }
         }
 
+        void updatebomb()
+        {
+            if (bomb != null)
+            {
+                if (lefthand != null)
+                {
+                    if (!release)
+                    {
+                        bomb.transform.position = leapToWorld(lefthand.PalmPosition);
+                    }
+                }
+            }
+        }
+        void displayarmwidget()
+        {
+            Vector3 far = new Vector3(999, 999, 999);
+            if (righthand != null)
+            {
+                GameObject player = GameObject.Find("CenterEyeAnchor");
+                Vector3 palmpos = leapToWorld(righthand.PalmPosition);
+                Vector3 mid = -Vector3.Cross(leapVectorToWorld(righthand.PalmNormal), leapVectorToWorld(righthand.Direction));
+                sphereswitch.transform.position = palmpos + 0.1f * mid + 0.1f * leapVectorToWorld(righthand.Direction);
+                sphererand.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
+                sphereexpand.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction); ;
+                spheresmall.transform.position = palmpos + 0.1f * mid - 0.1f * leapVectorToWorld(righthand.Direction);
+                txt1.transform.position = sphereswitch.transform.position + 0.1f * mid;
+                txt1.transform.forward = player.transform.forward;
+                txt2.transform.position = sphererand.transform.position + 0.1f * mid;
+                txt2.transform.forward = player.transform.forward;
+                txt3.transform.position = sphereexpand.transform.position + 0.1f * mid;
+                txt3.transform.forward = player.transform.forward;
+                txt4.transform.position = spheresmall.transform.position + 0.1f * mid;
+                txt4.transform.forward = player.transform.forward;
+            }
+            else
+            {
+                sphererand.transform.position = far;
+                sphereswitch.transform.position = far;
+                sphereexpand.transform.position = far;
+                spheresmall.transform.position = far;
+                txt1.transform.position = far;
+                txt2.transform.position = far;
+                txt3.transform.position = far;
+                txt4.transform.position = far;
+            }
+        }
         public bool switchmode()
         {
             if (switchtime > 1)
@@ -239,7 +267,7 @@ namespace gam
             if(Physics.Raycast(leaporigin + left, dir, out info) || Physics.Raycast(leaporigin + right, dir, out info)||
                 Physics.Raycast(leaporigin + up, dir, out info) || Physics.Raycast(leaporigin + up, dir, out info))
             {
-                if (info.collider.gameObject.tag != "button"&&info.collider.gameObject.transform.parent.gameObject.tag=="puzzle")
+                if (info.collider.gameObject.transform.parent!=null&&info.collider.gameObject.transform.parent.gameObject.tag=="puzzle")
                 {
                     return true;
                 }
@@ -341,7 +369,6 @@ namespace gam
         Vector3 leapToWorld(Leap.Vector v)
         {
             Matrix4x4 m = camera.cameraToWorldMatrix;
-            //Vector4 camori = m * new Vector4 (0, 0, 0, 1);
             Vector3 temp = leapToUnity(v)/1000.0f;
             Vector4 cameravec = m * new Vector4(temp.x, temp.y, temp.z, 0);
             Vector3 res = new Vector3(cameravec[0], cameravec[1], cameravec[2]);

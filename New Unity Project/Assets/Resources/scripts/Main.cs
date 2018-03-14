@@ -35,7 +35,7 @@ namespace gam
         {
             controller.Update();
             hands.connectToHands();
-            hands.moveobj();
+            hands.Update();
         }
     }
 }
