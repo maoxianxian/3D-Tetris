@@ -6,7 +6,7 @@ namespace gam
 {
     public class handController
     {
-        Leap.Hand lefthand;
+        public Leap.Hand lefthand;
         Leap.Hand righthand;
         Leap.Controller controller;
         GameObject grabbed;
@@ -31,11 +31,13 @@ namespace gam
         UnityEngine.UI.Text txt4;
         bool translate = true;
         public bool release = false;
+        Vector3 bombdir = Vector3.zero;
         public static handController getctr;
         public GameObject bomb;
         float movetime = 0;
         float switchtime = 0;
-
+        float releasetime=0;
+        Vector3 prebombpos=Vector3.zero;
         Vector3 leftprepos=Vector3.zero;
         public handController(gameController game, GameObject sph1,GameObject sph2, GameObject sph3,GameObject sph4, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt, UnityEngine.UI.Text wt)
         {
@@ -98,8 +100,8 @@ namespace gam
         {
             if (this.bomb == null)
             {
-                bomb.transform.position = leapToWorld(lefthand.PalmPosition);
                 this.bomb = bomb;
+                bomb.transform.position = leapToWorld(lefthand.PalmPosition);
                 release = false;
             }
         }
@@ -156,7 +158,6 @@ namespace gam
                     }
                     else
                     {//rotation
-                     //prepos = Vector3.zero;
                         if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
                         {// has target
                             GameObject target = info.collider.gameObject;
@@ -182,21 +183,44 @@ namespace gam
             {
                 if (lefthand != null)
                 {
-                    if (isFist(lefthand))
+                    if (bomb == null)
                     {
-                        if (leftprepos == Vector3.zero)
+                        if (isFist(lefthand))
                         {
-                            leftprepos = leapToWorld(lefthand.PalmPosition);
+                            if (leftprepos == Vector3.zero)
+                            {
+                                leftprepos = leapToWorld(lefthand.PalmPosition);
+                            }
+                            else
+                            {
+                                if ((leftprepos - leapToWorld(lefthand.PalmPosition)).magnitude > 0.15f)
+                                {
+                                    Vector3 dir = findclosestunit(leftprepos - leapToWorld(lefthand.PalmPosition));
+                                    gamer.moveplayer(dir);
+                                    leftprepos = Vector3.zero;
+                                    movetime = 0;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!isFist(lefthand)&&!release)
+                        {
+                            releasetime += Time.deltaTime;
+                            if (prebombpos == Vector3.zero) {
+                                prebombpos = bomb.transform.position;
+                            }
+                            if (releasetime > 0.3f)
+                            {
+                                release = true;
+                                bombdir = bomb.transform.position-prebombpos;
+                            }
                         }
                         else
                         {
-                            if ((leftprepos - leapToWorld(lefthand.PalmPosition)).magnitude > 0.15f)
-                            {
-                                Vector3 dir = findclosestunit(leftprepos - leapToWorld(lefthand.PalmPosition));
-                                gamer.moveplayer(dir);
-                                leftprepos = Vector3.zero;
-                                movetime = 0;
-                            }
+                            releasetime = 0;
+                            prebombpos = Vector3.zero;
                         }
                     }
                 }
@@ -207,12 +231,16 @@ namespace gam
         {
             if (bomb != null)
             {
-                if (lefthand != null)
+                if (!release)
                 {
-                    if (!release)
+                    if (lefthand != null)
                     {
                         bomb.transform.position = leapToWorld(lefthand.PalmPosition);
                     }
+                }
+                else
+                {
+                    bomb.transform.position += 0.1f * bombdir;
                 }
             }
         }
@@ -386,8 +414,12 @@ namespace gam
             return res;
         }
 
-        bool isFist(Leap.Hand h)
+        public bool isFist(Leap.Hand h)
         {
+            if (h == null)
+            {
+                return false;
+            }
             int badfinger = 0;
             foreach (Leap.Finger fig in h.Fingers)
             {

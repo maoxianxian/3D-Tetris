@@ -2425,7 +2425,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.00015582
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalPosition.y
@@ -2433,7 +2433,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 0.2
+      value: 0.2003
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalRotation.x
@@ -2457,15 +2457,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.3215837
+      value: 0.3247995
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.3215836
+      value: 0.32479942
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalScale.z
-      value: 0.32158384
+      value: 0.3247997
       objectReference: {fileID: 0}
     - target: {fileID: 448554, guid: aa64b9ae639024c5097e12b27ac1d84c, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -2488,8 +2488,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.26806554
-  m_Center: {x: -0.09458529, y: 0, z: 0.042702727}
+  m_Radius: 0.3362172
+  m_Center: {x: 0.019572323, y: 0.032976404, z: 0.042702742}
 --- !u!114 &1855619453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2515,7 +2515,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!1 &2034579044
 GameObject:
   m_ObjectHideFlags: 0

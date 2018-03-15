@@ -137,6 +137,11 @@ namespace gam
             gg.transform.position = origin.transform.position + 0.5f*origin.transform.forward;
             gg.transform.forward = origin.transform.forward;
         }
+        public void destroycub(int puzzleid, Vector3 cubecoord)
+        {
+            Debug.Log(puzzleid);
+            puzzles[puzzleid].destroy(WorldToCube(cubecoord));
+        }
         public void moveFallingPuzzle()
         {
             bomb.transform.position = origin.transform.position + new Vector3(0, -0.3f, 0)+ 0.1f*origin.transform.forward; 

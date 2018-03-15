@@ -127,7 +127,17 @@ namespace gam {
 
         public void destroy(Vector3 coord)
         {
-
+            for (int i = cubes.Count - 1; i >= 0; i--)
+            {
+                if(Vector3.Equals(coord, cubes[i].coord))
+                {
+                    Cube temp = cubes[i];
+                    gameController.unsetGrid(temp.coord);
+                    cubes.RemoveAt(i);
+                    GameObject.Destroy(temp.cub);
+                    return;
+                }
+            }
         }
     }
 }
