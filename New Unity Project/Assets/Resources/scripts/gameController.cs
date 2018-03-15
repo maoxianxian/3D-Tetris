@@ -98,7 +98,6 @@ namespace gam
                     Cube newcub = new Cube(cube, puzzlecount);
                     newp.addCube(newcub);
                 }
-                //fallingPuzzls.Add(newp);
                 puzzles.Add(newp);
                 curr = newp;
                 newpuzzle.name = puzzlecount.ToString();
@@ -139,8 +138,12 @@ namespace gam
         }
         public void destroycub(int puzzleid, Vector3 cubecoord)
         {
-            Debug.Log(puzzleid);
-            puzzles[puzzleid].destroy(WorldToCube(cubecoord));
+            if (handController.getctr.bomb != null)
+            {
+                puzzles[puzzleid - 1].destroy(cubecoord);
+                GameObject.Destroy(handController.getctr.bomb);
+                handController.getctr.bomb = null;
+            }
         }
         public void moveFallingPuzzle()
         {

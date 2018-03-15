@@ -214,7 +214,7 @@ namespace gam
                             if (releasetime > 0.3f)
                             {
                                 release = true;
-                                bombdir = bomb.transform.position-prebombpos;
+                                bombdir = 0.2f*Vector3.Normalize(bomb.transform.position-prebombpos);
                             }
                         }
                         else

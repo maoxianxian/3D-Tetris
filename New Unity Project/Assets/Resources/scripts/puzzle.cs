@@ -129,7 +129,7 @@ namespace gam {
         {
             for (int i = cubes.Count - 1; i >= 0; i--)
             {
-                if(Vector3.Equals(coord, cubes[i].coord))
+                if(Vector3.Equals(coord, cubes[i].cub.transform.position))
                 {
                     Cube temp = cubes[i];
                     gameController.unsetGrid(temp.coord);

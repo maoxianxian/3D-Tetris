@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 namespace gam {
     public class addBomb : MonoBehaviour {
+        public Destroycub scr;
         // Use this for initialization
         void Start() {
         }
@@ -20,6 +21,7 @@ namespace gam {
                 {
                     GameObject temp = GameObject.Instantiate(gameObject);
                     Destroy(temp.GetComponent<addBomb>());
+                    temp.AddComponent(typeof(Destroycub));
                     handController.getctr.addBomb(temp);
                 }
             }
