@@ -34,11 +34,14 @@ namespace gam
         Vector3 bombdir = Vector3.zero;
         public static handController getctr;
         public GameObject bomb;
+        public GameObject cub;
         float movetime = 0;
         float switchtime = 0;
         float releasetime=0;
         Vector3 prebombpos=Vector3.zero;
         Vector3 leftprepos=Vector3.zero;
+        float cubereleasetime = 0;
+        
         public handController(gameController game, GameObject sph1,GameObject sph2, GameObject sph3,GameObject sph4, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt, UnityEngine.UI.Text wt)
         {
             leapspace = GameObject.Find("LeapSpace");
@@ -96,6 +99,25 @@ namespace gam
             }
         }
 
+        public void addCub()
+        {
+            if (cub == null&&bomb==null)
+            {
+                cubereleasetime = 0;
+                this.cub = GameObject.Instantiate(GameObject.Find("Cubeee"));
+                GameObject.Destroy(cub.GetComponent<grabCube>());
+            }
+        }
+        void updatecube()
+        {
+            if (cub != null)
+            {
+                if (lefthand != null)
+                {
+                    cub.transform.position = leapToWorld(lefthand.PalmPosition);
+                }
+            }
+        }
         public void addBomb(GameObject bomb)
         {
             if (this.bomb == null)
@@ -110,6 +132,7 @@ namespace gam
             switchtime+=Time.deltaTime;
             displayarmwidget();
             updatebomb();
+            updatecube();
             objtime += Time.deltaTime;
             leaporigin = leapspace.transform.position;
             Matrix4x4 wtc = camera.worldToCameraMatrix;
@@ -183,7 +206,7 @@ namespace gam
             {
                 if (lefthand != null)
                 {
-                    if (bomb == null)
+                    if (bomb == null && cub == null)
                     {
                         if (isFist(lefthand))
                         {
@@ -203,24 +226,47 @@ namespace gam
                             }
                         }
                     }
-                    else
+                    else if (bomb != null)
                     {
-                        if (!isFist(lefthand)&&!release)
+                        if (!isFist(lefthand) && !release)
                         {
                             releasetime += Time.deltaTime;
-                            if (prebombpos == Vector3.zero) {
+                            if (prebombpos == Vector3.zero)
+                            {
                                 prebombpos = bomb.transform.position;
                             }
                             if (releasetime > 0.3f)
                             {
                                 release = true;
-                                bombdir = 0.2f*Vector3.Normalize(bomb.transform.position-prebombpos);
+                                bombdir = 0.2f * Vector3.Normalize(bomb.transform.position - prebombpos);
                             }
                         }
                         else
                         {
                             releasetime = 0;
                             prebombpos = Vector3.zero;
+                        }
+                    }
+                    else
+                    {
+                        if (!isFist(lefthand) && !release)
+                        {
+                            cubereleasetime += Time.deltaTime;
+                            if (cubereleasetime > 1)
+                            {
+                                //Debug.Log(leaporigin);
+                                //Debug.Log(leapspace.transform.forward);
+                                if(gameController.ctr.addCube(leaporigin + leapspace.transform.forward))
+                                {
+                                    cubereleasetime = 0;
+                                    GameObject.Destroy(cub);
+                                    cub = null;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            cubereleasetime = 0;
                         }
                     }
                 }

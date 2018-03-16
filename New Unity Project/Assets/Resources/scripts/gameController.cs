@@ -33,6 +33,7 @@ namespace gam
         puzzle curr;
         UnityEngine.UI.Text gg;
         GameObject bomb;
+        GameObject cub;
         GameObject origin;
         //List<ObjectMover> movers;
         static List<puzzle> puzzles;
@@ -40,6 +41,7 @@ namespace gam
         public gameController(int size, GameObject playerOb, int numberOfP, UnityEngine.UI.Text g)
         {
             bomb = GameObject.Find("Bomb");
+            cub = GameObject.Find("Cubeee");
             puzzles = new List<puzzle>();
             groundsize = size;
             occupied = new int[size, size, size];
@@ -133,7 +135,7 @@ namespace gam
         public void gameover()
         {
             gg.enabled = true;
-            gg.transform.position = origin.transform.position + 0.5f*origin.transform.forward;
+            gg.transform.position = origin.transform.position + 0.3f*origin.transform.forward;
             gg.transform.forward = origin.transform.forward;
         }
         public void destroycub(int puzzleid, Vector3 cubecoord)
@@ -145,9 +147,30 @@ namespace gam
                 handController.getctr.bomb = null;
             }
         }
+
+        public bool addCube(Vector3 coord)
+        {
+            coord = WorldToCube(coord);
+            if (valid(coord)&&getGrid(coord)==0)
+            {
+                GameObject cub = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/Cubeadd"));
+                cub.transform.position = coord;
+                puzzlecount++;
+                GameObject puzobj=new GameObject(puzzlecount.ToString());
+                cub.transform.parent = puzobj.transform;
+                puzzle newp = new puzzle(puzobj, puzzlecount);
+                newp.type = 6;
+                Cube c = new Cube(cub, puzzlecount);
+                newp.addCube(c);
+                puzzles.Add(newp);
+                return true;
+            }
+            return false;
+        }
         public void moveFallingPuzzle()
         {
-            bomb.transform.position = origin.transform.position + new Vector3(0, -0.3f, 0)+ 0.1f*origin.transform.forward; 
+            bomb.transform.position = origin.transform.position + new Vector3(0, -0.4f, 0)+ 0.1f * origin.transform.forward - 0.1f*origin.transform.right;
+            cub.transform.position = origin.transform.position + new Vector3(0, -0.4f, 0) + 0.1f * origin.transform.forward + 0.1f * origin.transform.right;
             movetime += Time.deltaTime;
             if (movetime > timeperunit)
             {

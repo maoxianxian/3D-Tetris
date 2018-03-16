@@ -15,7 +15,8 @@ namespace gam {
         }
         void OnTriggerEnter(Collider collision)
         {
-            if (collision.gameObject.name[0] == 'b'&& collision.gameObject.name[2] == 'n'&&handController.getctr.bomb==null)
+            if (collision.gameObject.name[0] == 'b'&& collision.gameObject.name[2] == 'n'&&handController.getctr.bomb==null&&
+                handController.getctr.cub==null)
             {
                 if (handController.getctr.isFist(handController.getctr.lefthand))
                 {
