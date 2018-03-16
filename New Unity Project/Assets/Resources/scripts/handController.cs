@@ -12,7 +12,7 @@ namespace gam
         GameObject grabbed;
         float objtime = 0;
         Vector3 leaporigin;
-        GameObject leapspace;
+        public GameObject leapspace;
         Camera camera;
         RaycastHit info;
         Vector3 prepos = Vector3.zero;
@@ -208,23 +208,20 @@ namespace gam
                 {
                     if (bomb == null && cub == null)
                     {
-                        if (isFist(lefthand))
-                        {
-                            if (leftprepos == Vector3.zero)
-                            {
-                                leftprepos = leapToWorld(lefthand.PalmPosition);
-                            }
-                            else
-                            {
-                                if ((leftprepos - leapToWorld(lefthand.PalmPosition)).magnitude > 0.15f)
-                                {
-                                    Vector3 dir = findclosestunit(leftprepos - leapToWorld(lefthand.PalmPosition));
-                                    gamer.moveplayer(dir);
-                                    leftprepos = Vector3.zero;
-                                    movetime = 0;
-                                }
-                            }
-                        }
+						if (isFist (lefthand)) {
+							if (leftprepos == Vector3.zero) {
+								leftprepos = leapToWorld (lefthand.PalmPosition);
+							} else {
+								if ((leftprepos - leapToWorld (lefthand.PalmPosition)).magnitude > 0.15f) {
+									Vector3 dir = findclosestunit (leftprepos - leapToWorld (lefthand.PalmPosition));
+									gamer.moveplayer (dir);
+									leftprepos = Vector3.zero;
+									movetime = 0;
+								}
+							}
+						} else {
+							leftprepos = Vector3.zero;
+						}
                     }
                     else if (bomb != null)
                     {
@@ -254,8 +251,6 @@ namespace gam
                             cubereleasetime += Time.deltaTime;
                             if (cubereleasetime > 1)
                             {
-                                //Debug.Log(leaporigin);
-                                //Debug.Log(leapspace.transform.forward);
                                 if(gameController.ctr.addCube(leaporigin + leapspace.transform.forward))
                                 {
                                     cubereleasetime = 0;
@@ -292,7 +287,7 @@ namespace gam
         }
         void displayarmwidget()
         {
-            Vector3 far = new Vector3(999, 999, 999);
+            Vector3 far = new Vector3(-0.5f, -0.5f, -0.5f);
             if (righthand != null)
             {
                 GameObject player = GameObject.Find("CenterEyeAnchor");

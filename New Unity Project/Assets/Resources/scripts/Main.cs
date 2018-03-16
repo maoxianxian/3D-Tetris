@@ -19,6 +19,8 @@ namespace gam
         public UnityEngine.UI.Text ztxt;
         public UnityEngine.UI.Text wtxt;
         public UnityEngine.UI.Text gg;
+		public UnityEngine.UI.Text point;
+
         // Use this for initialization
         void Start()
         {
@@ -36,6 +38,11 @@ namespace gam
             controller.Update();
             hands.connectToHands();
             hands.Update();
+			GameObject ori = gameController.ctr.origin;
+			int size = gameController.groundsize;
+			point.transform.position = new Vector3(size/2,size-1,size/2);
+			point.transform.forward = Vector3.up;
+			point.text = "money:" + System.Environment.NewLine + gameController.ctr.money;
         }
     }
 }

@@ -7,16 +7,8 @@ namespace gam
 {
     public class gameController
     {
-        //int[,] puzzlecoord=new int[,]{{0,0,0},{0,0,1},{0,0,2},{0,1,0},
-        /*	Vector3[] puzzlecoord={
-                new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,0,2),	new Vector3(0,1,0),				
-                new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,0,2),	new Vector3(0,1,1),				
-                new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,0,2),	new Vector3(0,0,3),	
-                new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,2),	new Vector3(0,1,1),				
-                new Vector3(0,1,0),	new Vector3(0,0,0),	new Vector3(0,0,1),	new Vector3(0,1,1)
-            };*/
         static int[,,] occupied;
-        static int groundsize;
+        public static int groundsize;
         GameObject player;
         Vector3 playercoord;
         Vector3 xoffset = new Vector3(0, 0, 0);
@@ -34,14 +26,21 @@ namespace gam
         UnityEngine.UI.Text gg;
         GameObject bomb;
         GameObject cub;
-        GameObject origin;
+        public GameObject origin;
         //List<ObjectMover> movers;
         static List<puzzle> puzzles;
         public static gameController ctr;
+		GameObject explosion;
+		UnityEngine.UI.Text bombtxt;
+		GameObject cubtxt;
+		public int money = 100;
         public gameController(int size, GameObject playerOb, int numberOfP, UnityEngine.UI.Text g)
         {
             bomb = GameObject.Find("Bomb");
+			explosion = GameObject.Find ("explosion");
             cub = GameObject.Find("Cubeee");
+			bombtxt = GameObject.Find ("bombmoney").GetComponent<UnityEngine.UI.Text>();
+			cubtxt = GameObject.Find ("cubemoney");
             puzzles = new List<puzzle>();
             groundsize = size;
             occupied = new int[size, size, size];
@@ -116,6 +115,7 @@ namespace gam
                 playercoord = player.transform.position;
             }
         }
+
         public bool BeginFallPuzzle()
         {
             bool gene = true;
@@ -132,26 +132,30 @@ namespace gam
             }
             return true;
         }
+
         public void gameover()
         {
             gg.enabled = true;
             gg.transform.position = origin.transform.position + 0.3f*origin.transform.forward;
             gg.transform.forward = origin.transform.forward;
         }
+
         public void destroycub(int puzzleid, Vector3 cubecoord)
         {
             if (handController.getctr.bomb != null)
             {
                 puzzles[puzzleid - 1].destroy(cubecoord);
+				explosion.transform.position = handController.getctr.bomb.transform.position;
                 GameObject.Destroy(handController.getctr.bomb);
                 handController.getctr.bomb = null;
+				explosion.GetComponent<ParticleSystem> ().Play ();
             }
         }
 
         public bool addCube(Vector3 coord)
         {
             coord = WorldToCube(coord);
-            if (valid(coord)&&getGrid(coord)==0)
+			if (valid(coord)&&getGrid(coord)==0&&money>=20)
             {
                 GameObject cub = (GameObject)GameObject.Instantiate(Resources.Load("prefabs/Cubeadd"));
                 cub.transform.position = coord;
@@ -163,32 +167,35 @@ namespace gam
                 Cube c = new Cube(cub, puzzlecount);
                 newp.addCube(c);
                 puzzles.Add(newp);
+				money -= 20;
                 return true;
             }
             return false;
         }
+
         public void moveFallingPuzzle()
-        {
-            bomb.transform.position = origin.transform.position + new Vector3(0, -0.4f, 0)+ 0.1f * origin.transform.forward - 0.1f*origin.transform.right;
-            cub.transform.position = origin.transform.position + new Vector3(0, -0.4f, 0) + 0.1f * origin.transform.forward + 0.1f * origin.transform.right;
-            movetime += Time.deltaTime;
-            if (movetime > timeperunit)
-            {
-                movetime = 0;
-                if (checkMat())
-                {
-                    foreach(puzzle p in puzzles)
-                    {
-                        p.destroybuttom();
-                    }
-                }
-                BeginFallPuzzle();
-            }
-            foreach (puzzle m in puzzles)
-            {
-                m.Update();
-            }
-        }
+		{
+			bomb.transform.position = origin.transform.position + new Vector3 (0, -0.4f, 0) + 0.1f * origin.transform.forward - 0.1f * origin.transform.right;
+			bombtxt.transform.position = bomb.transform.position + 0.15f * origin.transform.up;
+			bombtxt.transform.forward = origin.transform.forward;
+			cub.transform.position = origin.transform.position + new Vector3 (0, -0.4f, 0) + 0.1f * origin.transform.forward + 0.1f * origin.transform.right;
+			cubtxt.transform.position = cub.transform.position + 0.15f * origin.transform.up;
+			cubtxt.transform.forward = origin.transform.forward;
+			movetime += Time.deltaTime;
+			if (movetime > timeperunit) {
+				movetime = 0;
+				if (checkMat ()) {
+					foreach (puzzle p in puzzles) {
+						p.destroybuttom ();
+					}
+					money += 100;
+				}
+				BeginFallPuzzle ();
+			}
+			foreach (puzzle m in puzzles) {
+				m.Update ();
+			}
+		}
 
         public bool randomRotCur()
         {
