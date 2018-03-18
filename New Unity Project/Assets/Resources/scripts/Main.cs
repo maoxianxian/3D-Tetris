@@ -28,34 +28,33 @@ namespace gam
             player = GameObject.FindGameObjectWithTag("Player");
             //init controller
             controller = new gameController(groundsize, player, numberOfPuzzle,gg);
-            //controller.CreateEnvironment();
+            controller.CreateEnvironment();
             hands = new handController(controller, sphere1, sphere2, sphere3, sphere4, xtxt, ytxt, ztxt, wtxt);
-			CreateBoard ();
+			//CreateBoard ();
         }
 
         // Update is called once per frame
         void Update()
         {
-            /*controller.Update();
+            controller.Update();
             hands.connectToHands();
             hands.Update();
 			GameObject ori = gameController.ctr.origin;
 			int size = gameController.groundsize;
 			point.transform.position = new Vector3(size/2,size-1,size/2);
 			point.transform.forward = Vector3.up;
-			point.text = "money:" + System.Environment.NewLine + gameController.ctr.money;*/
+			point.text = "money:" + System.Environment.NewLine + gameController.ctr.money;
         }
 		void CreateBoard(){
 			string[] rows = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
-			GameObject canvas = GameObject.FindGameObjectWithTag ("keyboardcanvas");
+			GameObject keyboard = GameObject.FindGameObjectWithTag ("keyboard");
+			keyboard.transform.position = new Vector3(0.7f,0,4);
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < rows [i].Length; j++) {
 					GameObject key = (GameObject)GameObject.Instantiate (Resources.Load ("prefabs/Ka"));
-					key.transform.position = new Vector3 (i, 0, j);
-					Debug.Log (rows [i].Substring (j, 1));
+					key.transform.SetParent(keyboard.transform);
+					key.transform.position = new Vector3 (0.8f*i, 0.6f, 0.8f*j);
 					key.transform.GetChild (0).gameObject.GetComponent<UnityEngine.UI.Text> ().text = rows [i].Substring (j, 1);
-					key.transform.forward = Vector3.forward;
-					key.transform.parent = canvas.transform;
 				}
 			}
 		}
