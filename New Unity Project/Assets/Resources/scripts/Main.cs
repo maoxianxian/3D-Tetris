@@ -20,7 +20,8 @@ namespace gam
         public UnityEngine.UI.Text wtxt;
         public UnityEngine.UI.Text gg;
 		public UnityEngine.UI.Text point;
-
+        public static bool gamestart = false;
+        public static string username;
         // Use this for initialization
         void Start()
         {
@@ -30,20 +31,22 @@ namespace gam
             controller = new gameController(groundsize, player, numberOfPuzzle,gg);
             controller.CreateEnvironment();
             hands = new handController(controller, sphere1, sphere2, sphere3, sphere4, xtxt, ytxt, ztxt, wtxt);
-			//CreateBoard ();
+			CreateBoard ();
         }
 
         // Update is called once per frame
         void Update()
         {
-            controller.Update();
-            hands.connectToHands();
-            hands.Update();
-			GameObject ori = gameController.ctr.origin;
-			int size = gameController.groundsize;
-			point.transform.position = new Vector3(size/2,size-1,size/2);
-			point.transform.forward = Vector3.up;
-			point.text = "money:" + System.Environment.NewLine + gameController.ctr.money;
+            if (gamestart)
+            {
+                controller.Update();
+                hands.connectToHands();
+                hands.Update();
+                int size = gameController.groundsize;
+                point.transform.position = new Vector3(size / 2, size - 1, size / 2);
+                point.transform.forward = Vector3.up;
+                point.text = "money:" + System.Environment.NewLine + gameController.ctr.money;
+            }
         }
 		void CreateBoard(){
 			string[] rows = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
@@ -52,11 +55,13 @@ namespace gam
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < rows [i].Length; j++) {
 					GameObject key = (GameObject)GameObject.Instantiate (Resources.Load ("prefabs/Ka"));
+                    key.name = "K" + rows[i].Substring(j, 1);
 					key.transform.SetParent(keyboard.transform);
-					key.transform.position = new Vector3 (0.8f*i, 0.6f, 0.8f*j);
+					key.transform.position = new Vector3 (0.8f*i, 0.4f, 0.8f*j+0.3f);
 					key.transform.GetChild (0).gameObject.GetComponent<UnityEngine.UI.Text> ().text = rows [i].Substring (j, 1);
 				}
 			}
+            keyboard.transform.localScale/=12.0f;
 		}
     }
 }

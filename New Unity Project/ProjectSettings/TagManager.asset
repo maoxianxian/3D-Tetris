@@ -9,6 +9,9 @@ TagManager:
   - wall
   - keyboardcanvas
   - keyboard
+  - Fire
+  - space
+  - enter
   layers:
   - Default
   - TransparentFX

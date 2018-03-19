@@ -30,7 +30,7 @@
 
 	SubShader
 	{
-		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" }
+		Tags{ "Queue" = "Transparent"  }
 
 		Pass //Outline
 		{
