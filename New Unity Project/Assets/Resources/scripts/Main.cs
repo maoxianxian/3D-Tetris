@@ -45,7 +45,7 @@ namespace gam
                 int size = gameController.groundsize;
                 point.transform.position = new Vector3(size / 2, size - 1, size / 2);
                 point.transform.forward = Vector3.up;
-                point.text = "money:" + System.Environment.NewLine + gameController.ctr.money;
+                point.text = KeyboardAction.username+"'s money:" + System.Environment.NewLine + gameController.ctr.money;
             }
         }
 		void CreateBoard(){
