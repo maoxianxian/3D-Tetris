@@ -20,7 +20,8 @@ namespace gam
             nametxt.transform.position = leap.transform.position + 1.5f*leap.transform.forward+0.3f*leap.transform.up;
             nametxt.transform.forward = leap.transform.forward;
             transform.position = leap.transform.position+0.4f*leap.transform.forward-0.2f*leap.transform.up;
-            transform.forward = Vector3.Normalize(-leap.transform.up+leap.transform.forward);
+            //transform.forward = Vector3.Normalize(-leap.transform.up+leap.transform.forward);
+            transform.LookAt(transform.position-Vector3.up);
         }
     }
 }

@@ -32,10 +32,14 @@ namespace gam
         public static gameController ctr;
 		GameObject explosion;
 		UnityEngine.UI.Text bombtxt;
-		GameObject cubtxt;
+        GameObject bombcub;
+        GameObject cubcub;
+        GameObject cubtxt;
 		public int money = 100;
         public gameController(int size, GameObject playerOb, int numberOfP, UnityEngine.UI.Text g)
         {
+            bombcub = GameObject.Find("bombcub");
+            cubcub = GameObject.Find("cubecub");
             bomb = GameObject.Find("Bomb");
 			explosion = GameObject.Find ("explosion");
             cub = GameObject.Find("Cubeee");
@@ -135,9 +139,12 @@ namespace gam
 
         public void gameover()
         {
+            GameObject cub = GameObject.Find("ggcube");
             gg.enabled = true;
             gg.transform.position = origin.transform.position + 0.3f*origin.transform.forward;
             gg.transform.forward = origin.transform.forward;
+            cub.transform.position = gg.transform.position + 0.03f*origin.transform.forward;
+            cub.transform.forward = origin.transform.forward;
         }
 
         public void destroycub(int puzzleid, Vector3 cubecoord)
@@ -174,28 +181,36 @@ namespace gam
         }
 
         public void moveFallingPuzzle()
-		{
-			bomb.transform.position = origin.transform.position + new Vector3 (0, -0.4f, 0) + 0.1f * origin.transform.forward - 0.1f * origin.transform.right;
-			bombtxt.transform.position = bomb.transform.position + 0.15f * origin.transform.up;
-			bombtxt.transform.forward = origin.transform.forward;
-			cub.transform.position = origin.transform.position + new Vector3 (0, -0.4f, 0) + 0.1f * origin.transform.forward + 0.1f * origin.transform.right;
-			cubtxt.transform.position = cub.transform.position + 0.15f * origin.transform.up;
-			cubtxt.transform.forward = origin.transform.forward;
-			movetime += Time.deltaTime;
-			if (movetime > timeperunit) {
-				movetime = 0;
-				if (checkMat ()) {
-					foreach (puzzle p in puzzles) {
-						p.destroybuttom ();
-					}
-					money += 100;
-				}
-				BeginFallPuzzle ();
-			}
-			foreach (puzzle m in puzzles) {
-				m.Update ();
-			}
-		}
+        {
+            bomb.transform.position = origin.transform.position + new Vector3(0, -0.4f, 0) + 0.1f * origin.transform.forward - 0.1f * origin.transform.right;
+            bombtxt.transform.position = bomb.transform.position + 0.15f * origin.transform.up;
+            bombtxt.transform.forward = origin.transform.forward;
+            bombcub.transform.position = bombtxt.transform.position + 0.02f * origin.transform.forward;
+            bombcub.transform.forward = origin.transform.forward;
+            cub.transform.position = origin.transform.position + new Vector3(0, -0.4f, 0) + 0.1f * origin.transform.forward + 0.1f * origin.transform.right;
+            cubtxt.transform.position = cub.transform.position + 0.15f * origin.transform.up;
+            cubtxt.transform.forward = origin.transform.forward;
+            cubcub.transform.position = cubtxt.transform.position + 0.02f * origin.transform.forward;
+            cubcub.transform.forward = origin.transform.forward;
+            movetime += Time.deltaTime;
+            if (movetime > timeperunit)
+            {
+                movetime = 0;
+                if (checkMat())
+                {
+                    foreach (puzzle p in puzzles)
+                    {
+                        p.destroybuttom();
+                    }
+                    money += 100;
+                }
+                BeginFallPuzzle();
+            }
+            foreach (puzzle m in puzzles)
+            {
+                m.Update();
+            }
+        }
 
         public bool randomRotCur()
         {

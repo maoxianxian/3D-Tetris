@@ -24,7 +24,7 @@ namespace gam
         GameObject sphererand;
         GameObject sphereexpand;
         GameObject spheresmall;
-
+        GameObject menu;
         UnityEngine.UI.Text txt1;
         UnityEngine.UI.Text txt2;
         UnityEngine.UI.Text txt3;
@@ -41,9 +41,10 @@ namespace gam
         Vector3 prebombpos=Vector3.zero;
         Vector3 leftprepos=Vector3.zero;
         float cubereleasetime = 0;
-        
+        float leavetime = 0;
         public handController(gameController game, GameObject sph1,GameObject sph2, GameObject sph3,GameObject sph4, UnityEngine.UI.Text xt, UnityEngine.UI.Text yt, UnityEngine.UI.Text zt, UnityEngine.UI.Text wt)
         {
+            menu = GameObject.Find("menu");
             leapspace = GameObject.Find("LeapSpace");
             controller = new Leap.Controller();
             camera = GameObject.Find("CenterEyeAnchor").GetComponent<Camera>();
@@ -153,6 +154,7 @@ namespace gam
                         {//valid pos
                             if (detectColli(leftoffset, rightoffset, upoffset, downoffset, dir))
                             {// has target
+                                leavetime = 0;
                                 GameObject target = info.collider.gameObject;
                                 if (prepos == Vector3.zero)
                                 {//first hit
@@ -175,7 +177,11 @@ namespace gam
                             }
                             else
                             { //reset pre
-                                prepos = Vector3.zero;
+                                leavetime += Time.deltaTime;
+                                if (leavetime > 0.5f)
+                                {
+                                    prepos = Vector3.zero;
+                                }
                             }
                         }
                     }
@@ -288,26 +294,30 @@ namespace gam
         void displayarmwidget()
         {
             Vector3 far = new Vector3(-0.5f, -0.5f, -0.5f);
-            if (righthand != null)
+            GameObject player = GameObject.Find("CenterEyeAnchor");
+            if (righthand != null&& Vector3.Dot(leapVectorToWorld(righthand.PalmNormal),player.transform.forward)<-0.5f)
             {
-                GameObject player = GameObject.Find("CenterEyeAnchor");
                 Vector3 palmpos = leapToWorld(righthand.PalmPosition);
                 Vector3 mid = -Vector3.Cross(leapVectorToWorld(righthand.PalmNormal), leapVectorToWorld(righthand.Direction));
-                sphereswitch.transform.position = palmpos + 0.1f * mid + 0.1f * leapVectorToWorld(righthand.Direction);
-                sphererand.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction);
-                sphereexpand.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction); ;
-                spheresmall.transform.position = palmpos + 0.1f * mid - 0.1f * leapVectorToWorld(righthand.Direction);
-                txt1.transform.position = sphereswitch.transform.position + 0.1f * mid;
-                txt1.transform.forward = player.transform.forward;
-                txt2.transform.position = sphererand.transform.position + 0.1f * mid;
-                txt2.transform.forward = player.transform.forward;
-                txt3.transform.position = sphereexpand.transform.position + 0.1f * mid;
-                txt3.transform.forward = player.transform.forward;
-                txt4.transform.position = spheresmall.transform.position + 0.1f * mid;
-                txt4.transform.forward = player.transform.forward;
+                sphereswitch.transform.position = palmpos + 0.1f * mid + 0.1f * leapVectorToWorld(righthand.Direction) + 0.02f * leapVectorToWorld(righthand.PalmNormal);
+                sphererand.transform.position = palmpos + 0.1f * mid + 0.05f * leapVectorToWorld(righthand.Direction) + 0.02f * leapVectorToWorld(righthand.PalmNormal);
+                sphereexpand.transform.position = palmpos + 0.1f * mid - 0.05f * leapVectorToWorld(righthand.Direction) + 0.02f * leapVectorToWorld(righthand.PalmNormal);
+                spheresmall.transform.position = palmpos + 0.1f * mid - 0.1f * leapVectorToWorld(righthand.Direction) + 0.02f * leapVectorToWorld(righthand.PalmNormal);
+
+                menu.transform.position = palmpos + 0.2f * mid;
+                menu.transform.LookAt(palmpos + 0.25f * mid + leapVectorToWorld(righthand.Direction), mid);
+                txt1.transform.position = menu.transform.position - 0.03f * player.transform.forward + 0.08f * menu.transform.forward;
+                txt1.transform.LookAt((txt1.transform.position - menu.transform.right), menu.transform.forward);
+                txt2.transform.position = menu.transform.position - 0.03f * player.transform.forward + 0.03f * menu.transform.forward;
+                txt2.transform.LookAt(txt1.transform.position - menu.transform.right, menu.transform.forward);
+                txt3.transform.position = menu.transform.position - 0.03f * player.transform.forward - 0.03f * menu.transform.forward;
+                txt3.transform.LookAt(txt1.transform.position - menu.transform.right, menu.transform.forward);
+                txt4.transform.position = menu.transform.position - 0.03f * player.transform.forward - 0.08f * menu.transform.forward;
+                txt4.transform.LookAt(txt1.transform.position - menu.transform.right, menu.transform.forward);
             }
             else
             {
+                menu.transform.position = far;
                 sphererand.transform.position = far;
                 sphereswitch.transform.position = far;
                 sphereexpand.transform.position = far;
