@@ -218,7 +218,7 @@ namespace gam
 							if (leftprepos == Vector3.zero) {
 								leftprepos = leapToWorld (lefthand.PalmPosition);
 							} else {
-								if ((leftprepos - leapToWorld (lefthand.PalmPosition)).magnitude > 0.15f) {
+								if ((leftprepos - leapToWorld (lefthand.PalmPosition)).magnitude > 0.14f) {
 									Vector3 dir = findclosestunit (leftprepos - leapToWorld (lefthand.PalmPosition));
 									gamer.moveplayer (dir);
 									leftprepos = Vector3.zero;
