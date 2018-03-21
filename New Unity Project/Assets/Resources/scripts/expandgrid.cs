@@ -6,7 +6,11 @@ namespace gam
     public class expandgrid : MonoBehaviour
     {
         Material orimat;
-        float t = 0;
+        float t;
+        float preestime;
+        int coliitem = 0;
+        float presstime = 0;
+        bool pressing = false;
         // Use this for initialization
         void Start()
         {
@@ -17,7 +21,16 @@ namespace gam
         void Update()
         {
             t += Time.deltaTime;
-
+            if (pressing)
+            {
+                presstime += Time.deltaTime;
+            }
+            if (presstime > 0.5f)
+            {
+                pressing = false;
+                presstime = 0;
+                gameController.ctr.expandgrid();
+            }
         }
         void OnTriggerEnter(Collider collision)
         {
@@ -25,15 +38,24 @@ namespace gam
             {
                 if (collision.gameObject.name[0] == 'b')
                 {
-                    gameController.ctr.expandgrid();
+                    
+                    coliitem++;
                     highlight();
                     t = 0;
+                    pressing = true;
                 }
             }
         }
         void OnTriggerExit(Collider collision)
         {
-            dehighlight();
+            if (collision.gameObject.name[0] == 'b')
+            {
+                coliitem--;
+                presstime = 0;
+                pressing = false;
+                dehighlight();
+
+            }
         }
 
         void highlight()

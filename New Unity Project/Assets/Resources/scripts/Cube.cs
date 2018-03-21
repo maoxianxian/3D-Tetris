@@ -67,16 +67,20 @@ namespace gam
             return true;
         }
 
-        public void rotateAround(Vector3 axis, Vector3 gridpoint)
+        public bool rotateAround(Vector3 axis, Vector3 gridpoint)
         {
-            //Debug.Log("axis " + axis.ToString());
-            //Debug.Log(gridpoint.ToString());
+            Vector3 pre = coord;
             GameObject temp =(GameObject)GameObject.Instantiate(Resources.Load("prefabs/rotator"));
             temp.transform.position = coord;
             temp.transform.RotateAround(gridpoint, axis, 90.0f);
             gameController.unsetGrid(coord);
             coord = temp.transform.position;
             gameController.setGrid(coord, id);
+            if (pre == coord)
+            {
+                return false;
+            }
+            return true;
         }
 
         public void highlight(Material mat)

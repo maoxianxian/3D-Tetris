@@ -26,7 +26,7 @@ namespace gam
             {
                 if (collision.gameObject.name[0] == 'b')
                 {
-                    while (!gameController.ctr.randomRotCur()&&ite<10)
+                    while (!gameController.ctr.randomRotCur()&&ite<20)
                     {
                         ite++;
                     }

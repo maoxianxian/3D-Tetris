@@ -37,7 +37,6 @@ namespace gam {
             {
                 c.startMove(dir);
             }
-            
             movedir += dir;
             coord = coord + dir;
             return true;
@@ -45,6 +44,7 @@ namespace gam {
         
         public bool rotate(Vector3 axis)
         {
+            bool moved = false;
             foreach (Cube c in cubes)
             {
                 if (!c.checkrotate(axis, coord))
@@ -54,10 +54,13 @@ namespace gam {
             }
             foreach (Cube c in cubes)
             {
-                c.rotateAround(axis, coord);
+                if(c.rotateAround(axis, coord))
+                {
+                    moved = true;
+                }
             }
             puz.transform.RotateAround(puz.transform.position,axis,90);
-            return true;
+            return moved;
         }
         public void Update()
         {

@@ -36,6 +36,7 @@ namespace gam
         GameObject cubcub;
         GameObject cubtxt;
 		public int money = 100;
+        GameObject ggcub;
         public gameController(int size, GameObject playerOb, int numberOfP, UnityEngine.UI.Text g)
         {
             bombcub = GameObject.Find("bombcub");
@@ -56,6 +57,8 @@ namespace gam
             gg = g;
             gg.enabled = false;
             origin = player.transform.GetChild(0).gameObject;
+            ggcub = GameObject.Find("ggcube");
+            ggcub.SetActive(false);
         }
 
         public void CreateEnvironment()
@@ -139,12 +142,12 @@ namespace gam
 
         public void gameover()
         {
-            GameObject cub = GameObject.Find("ggcube");
+            ggcub.SetActive(true);
             gg.enabled = true;
             gg.transform.position = origin.transform.position + 0.3f*origin.transform.forward;
             gg.transform.forward = origin.transform.forward;
-            cub.transform.position = gg.transform.position + 0.03f*origin.transform.forward;
-            cub.transform.forward = origin.transform.forward;
+            ggcub.transform.position = gg.transform.position + 0.03f*origin.transform.forward;
+            ggcub.transform.forward = origin.transform.forward;
         }
 
         public void destroycub(int puzzleid, Vector3 cubecoord)

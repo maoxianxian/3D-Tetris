@@ -44,9 +44,9 @@ namespace gam{
         }
         void OnTriggerExit(Collider collision)
         {
-            coliitem--;
-            if (coliitem == 0)
+            if (collision.gameObject.name[0] == 'b')
             {
+                coliitem--;
                 presstime = 0;
                 pressing = false;
                 dehighlight();
