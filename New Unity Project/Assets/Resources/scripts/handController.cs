@@ -162,7 +162,7 @@ namespace gam
                                 }
                                 else
                                 {
-                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.065f)
+                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.06f)
                                     {//move obj
                                         int id = Int32.Parse(target.transform.parent.gameObject.name);
                                         puzzle p = gameController.GetPuzzle(id);
@@ -252,7 +252,7 @@ namespace gam
                     }
                     else
                     {
-                        if (!isFist(lefthand) && !release)
+                        if (!isFist(lefthand))
                         {
                             cubereleasetime += Time.deltaTime;
                             if (cubereleasetime > 1)
@@ -264,10 +264,6 @@ namespace gam
                                     cub = null;
                                 }
                             }
-                        }
-                        else
-                        {
-                            cubereleasetime = 0;
                         }
                     }
                 }
