@@ -162,7 +162,7 @@ namespace gam
                                 }
                                 else
                                 {
-                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.07f)
+                                    if ((prepos - leapToWorld(righthand.PalmPosition)).magnitude > 0.065f)
                                     {//move obj
                                         int id = Int32.Parse(target.transform.parent.gameObject.name);
                                         puzzle p = gameController.GetPuzzle(id);
@@ -218,7 +218,7 @@ namespace gam
 							if (leftprepos == Vector3.zero) {
 								leftprepos = leapToWorld (lefthand.PalmPosition);
 							} else {
-								if ((leftprepos - leapToWorld (lefthand.PalmPosition)).magnitude > 0.14f) {
+								if ((leftprepos - leapToWorld (lefthand.PalmPosition)).magnitude > 0.12f) {
 									Vector3 dir = findclosestunit (leftprepos - leapToWorld (lefthand.PalmPosition));
 									gamer.moveplayer (dir);
 									leftprepos = Vector3.zero;
@@ -344,7 +344,7 @@ namespace gam
         bool detectColli(Vector3 left, Vector3 right, Vector3 up, Vector3 down, Vector3 dir)
         {
             if(Physics.Raycast(leaporigin + left, dir, out info) || Physics.Raycast(leaporigin + right, dir, out info)||
-                Physics.Raycast(leaporigin + up, dir, out info) || Physics.Raycast(leaporigin + up, dir, out info))
+                Physics.Raycast(leaporigin + up, dir, out info) || Physics.Raycast(leaporigin + down, dir, out info)|| Physics.Raycast(leaporigin, dir, out info))
             {
                 if (info.collider.gameObject.transform.parent!=null&&info.collider.gameObject.transform.parent.gameObject.tag=="puzzle")
                 {
