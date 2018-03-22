@@ -49,7 +49,7 @@ namespace gam
             }
         }
 		void CreateBoard(){
-			string[] rows = { "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM" };
+			string[] rows = { "qwertyuiop", "asdfghjkl", "zxcvbnm" };
 			GameObject keyboard = GameObject.FindGameObjectWithTag ("keyboard");
 			keyboard.transform.position = new Vector3(0.7f,0,4);
 			for (int i = 0; i < 3; i++) {
