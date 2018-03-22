@@ -339,8 +339,8 @@ namespace gam
         }
         bool detectColli(Vector3 left, Vector3 right, Vector3 up, Vector3 down, Vector3 dir)
         {
-            if(Physics.Raycast(leaporigin + left, dir, out info) || Physics.Raycast(leaporigin + right, dir, out info)||
-                Physics.Raycast(leaporigin + up, dir, out info) || Physics.Raycast(leaporigin + down, dir, out info)|| Physics.Raycast(leaporigin, dir, out info))
+            if(Physics.Raycast(leaporigin , dir+ left, out info) || Physics.Raycast(leaporigin , dir+ right, out info)||
+                Physics.Raycast(leaporigin , dir+ up, out info) || Physics.Raycast(leaporigin , dir+ down, out info)|| Physics.Raycast(leaporigin, dir, out info))
             {
                 if (info.collider.gameObject.transform.parent!=null&&info.collider.gameObject.transform.parent.gameObject.tag=="puzzle")
                 {
